@@ -78,10 +78,10 @@ function updateLatestChainBlock() {
   callBitcoin('getblockchaininfo', [], (json) => {
 
     console.log("************************************ GET BLOCKCHAIN INFO **********************************")
-    console.log(json)
+    console.log(json.result.blocks)
     console.log('*******************************************************************************************')
 
-    setLatestChainBlock(json.blocks)
+    setLatestChainBlock(json.result.blocks)
 
     //call every minute to see if something changed?
     setTimeout(updateLatestChainBlock, 60000)
@@ -116,8 +116,8 @@ function getBlock(blockHash, callback) {
     //store in DB
     async.parallel([
       (callback) => { saveBlock(json, callback) },
-      (callback) => { setLatestLocalBlock(json.height, callback) },
-      (callback) => { getTransactions(json.tx, callback) }
+      (callback) => { setLatestLocalBlock(json.result.height, callback) },
+      (callback) => { getTransactions(json.result.tx, callback) }
     ], callback)
   })
 }
@@ -137,13 +137,13 @@ function getTransactions(transactions, callback) {
 
 function getTransaction(transaction, callback) {
   callBitcoin('getTransaction', [transaction], (json) => {
-    saveTransaction(json, callback)
+    saveTransaction(json.result, callback)
   })
 }
 
-function saveTransaction(block, callback) {
+function saveTransaction(transaction, callback) {
   console.log('************************************* STORING NEW TXN *************************************')
-  console.log(block)
+  console.log(transaction)
   console.log('*******************************************************************************************')
   // db.none("insert into transactions () values ();", [])
   // .then(callback)
