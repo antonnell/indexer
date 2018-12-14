@@ -8,9 +8,13 @@ fetch(con, {
     "method": "getblockhash",
     "params": [0]
   }),
-  headers: { 'Content-Type': 'text/plain;' },
+  headers: {
+    'Content-Type': 'text/plain;'
+    'Authorization': 'Basic dXNlcjpwYXNzd29yZA==''
+  },
 })
 .then((res) => {
+  console.log(res)
   return res.json()
 })
 .then((json) => {
