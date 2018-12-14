@@ -56,15 +56,16 @@ function processBlocks() {
     console.log(parseInt(latestChain) > parseInt(latestLocal))
 
     if(parseInt(latestChain) > parseInt(latestLocal)) {
-      console.log("*********************************** PROCESSING NEW BLOCK **********************************")
-      console.log(parseInt(latestLocal) + 1)
-      console.log('*******************************************************************************************')
+      // console.log("*********************************** PROCESSING NEW BLOCK **********************************")
+      // console.log(parseInt(latestLocal) + 1)
+      // console.log('*******************************************************************************************')
 
       getBlockHash(parseInt(latestLocal) + 1, (err) => {
+        console.log('aSDASDASDASD')
         if(err) {
           console.log(err)
         }
-        processBlocks
+        processBlocks()
       })
     } else {
 
