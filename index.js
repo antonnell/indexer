@@ -8,7 +8,7 @@ fetch(con, {
     "method": "getblockhash",
     "params": [0]
   }),
-  headers: { 'Content-Type': 'application/json; charset=utf-8' },
+  headers: { 'Content-Type': 'text/plain;' },
 })
 .then((res) => {
   return res.json()
