@@ -40,8 +40,12 @@ function processBlocks() {
     (callback) => { getLatestLocalBlock(callback) }
   ], (err, blockDetails) => {
     if(err) {
-      return console.log(err)
+      console.log("****************************************** ERROR ******************************************")
+      console.log(err)
+      console.log('*******************************************************************************************')
+      return
     }
+    
     console.log('DEBUG ***********')
     console.log(blockDetails)
     console.log('DEBUG ***********')
@@ -75,7 +79,9 @@ function setLatestChainBlock(value) {
 function getLatestChainBlock(callback) {
   client.get("latest-chain-block", (err, value) => {
     if(err) {
+      console.log("****************************************** ERROR ******************************************")
       console.log(err)
+      console.log('*******************************************************************************************')
     }
     callback(value)
   });
@@ -105,7 +111,9 @@ function setLatestLocalBlock(value, callback) {
 function getLatestLocalBlock(callback) {
   client.get("latest-local-block", (err, value) => {
     if(err) {
+      console.log("****************************************** ERROR ******************************************")
       console.log(err)
+      console.log('*******************************************************************************************')
     }
 
     callback(value)
