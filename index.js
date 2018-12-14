@@ -42,6 +42,9 @@ function processBlocks() {
     if(err) {
       return console.log(err)
     }
+    console.log('DEBUG ***********')
+    console.log(blockDetails)
+    console.log('DEBUG ***********')
     let latestChain = blockDetails[0]
     let latestLocal = blockDetails[1]
 
@@ -56,6 +59,10 @@ function processBlocks() {
 
       getBlockHash(parseInt(latestLocal) + 1, processBlocks)
     } else {
+
+      console.log('DEBUG ***********')
+      console.log('sleeping for 1 minute')
+      console.log('DEBUG ***********')
       setTimeout(processBlocks, 60000)
     }
   })
