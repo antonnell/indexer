@@ -152,11 +152,13 @@ function getTransactions(transactions, callback) {
 }
 
 function getTransaction(transaction, callback) {
-  callBitcoin('getTransaction', [transaction], (json) => {
-    async.parallel([
-      (callbackInner) => { saveTransaction(json.result, callbackInner) },
-      (callbackInner) => { saveTransactionDetails(json.result, callbackInner) }
-    ], callback)
+  callBitcoin('getrawtransaction', [transaction, true], (json) => {
+    saveTransaction(json.result, callback)
+
+    // async.parallel([
+    //   (callbackInner) => { saveTransaction(json.result, callbackInner) },
+    //   (callbackInner) => { saveTransactionDetails(json.result, callbackInner) }
+    // ], callback)
   })
 }
 
@@ -164,8 +166,8 @@ function saveTransaction(transaction, callback) {
   console.log('************************************* STORING NEW TXN *************************************')
   console.log(transaction)
   console.log('*******************************************************************************************')
-  db.none('insert into transactions (amount, fee, confirmations, generated, blockhash, blockindex, blocktime, txid, time, timereceived, bip125replaceable, comment, "to", hex) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14);',
-  [transaction.amount, transaction.fee, transaction.confirmations, transaction.generated, transaction.blockhash, transaction.blockindex, transaction.blocktime, transaction.txid, transaction.time, transaction.timereceived, transaction["bip125-replaceable"], transaction.comment, transaction.to, transaction.hex])
+  db.none('insert into transactions (txid, hash, version, size, vsize, weight, locktime, vin, vout, blockhash, confirmations, time, blocktime) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13);',
+  [transaction.txid, transaction.hash, transaction.version, transaction.size, transaction.vsize, transaction.weight, transaction.locktime, transaction.vin, transaction.vout, transaction.blockhash, transaction.confirmations, transaction.time, transaction.blocktime])
     .then(callback)
     .catch(callback)
 }
