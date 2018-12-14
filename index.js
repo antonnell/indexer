@@ -78,7 +78,7 @@ function updateLatestChainBlock() {
   callBitcoin('getblockchaininfo', [], (json) => {
 
     console.log("************************************ GET BLOCKCHAIN INFO **********************************")
-    console.log(json.blocks)
+    console.log(json)
     console.log('*******************************************************************************************')
 
     setLatestChainBlock(json.blocks)
