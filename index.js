@@ -22,6 +22,7 @@ function getBlock(blockHash) {
     return res.json()
   })
   .then((json) => {
+    console.log(json)
     getBlock(json.result)
   })
   .catch(console.log)
@@ -44,7 +45,7 @@ function getBlockHash(blockNumber) {
   })
   .then((json) => {
     console.log(json)
-
+    getBlock(json.result)
   })
   .catch(console.log)
 }
