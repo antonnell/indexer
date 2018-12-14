@@ -168,22 +168,15 @@ function saveTransaction(transaction, callback) {
   console.log('************************************* STORING NEW TXN *************************************')
   console.log(transaction)
   console.log('*******************************************************************************************')
+
+  let vin = {
+    result: transaction.vin
+  }
+  let vout = {
+    result: transaction.vout
+  }
   db.none('insert into transactions (txid, hash, version, size, vsize, weight, locktime, vin, vout, blockhash, confirmations, time, blocktime) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13);',
-  [transaction.txid, transaction.hash, transaction.version, transaction.size, transaction.vsize, transaction.weight, transaction.locktime, transaction.vin, transaction.vout, transaction.blockhash, transaction.confirmations, transaction.time, transaction.blocktime])
-    .then(callback)
-    .catch(callback)
-}
-
-function saveTransactionDetails(transaction, callback) {
-  async.mapLimit(transaction.details, 2, saveTransactionDetail, callback)
-}
-
-function saveTransactionDetail(details, callback) {
-  console.log('********************************* STORING NEW TXN DETAILS *********************************')
-  console.log(details)
-  console.log('*******************************************************************************************')
-  db.none('insert into transaction_details (account, address, category, amount, vout, fee) values ($1, $2, $3, $4, $5, $6);',
-  [details.amount, details.address, details.category, details.amount, details.vout, details.fee])
+  [transaction.txid, transaction.hash, transaction.version, transaction.size, transaction.vsize, transaction.weight, transaction.locktime, vin, vout, transaction.blockhash, transaction.confirmations, transaction.time, transaction.blocktime])
     .then(callback)
     .catch(callback)
 }
