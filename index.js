@@ -1,28 +1,51 @@
 const fetch = require('node-fetch')
 
 let con = 'http://localhost:8332'
+let authHash = 'dXNlcjpwYXNzd29yZA=='
 
-fetch(con, {
-  method: 'POST',
-  body: JSON.stringify({
-    "method": "getblockhash",
-    "params": [0]
-  }),
-  headers: {
-    'Content-Type': 'text/plain;'
-    'Authorization': 'Basic dXNlcjpwYXNzd29yZA==''
-  },
-})
-.then((res) => {
-  console.log(res)
-  return res.json()
-})
-.then((json) => {
-  model.updateToRestarted(req, res, next, transactionID, clientID, json.access)
-})
-.catch(function(err) {
-  console.log(err)
-  res.status(500)
-  res.body = { 'status': 500, 'success': false, 'message': err }
-  return next(null, req, res, next)
-})
+
+getBlockHash(0)
+
+function getBlock(blockHash) {
+  fetch(con, {
+    method: 'POST',
+    body: JSON.stringify({
+      "method": "getblock",
+      "params": [blockHash]
+    }),
+    headers: {
+      'Content-Type': 'text/plain;',
+      'Authorization': 'Basic '+authHash
+    },
+  })
+  .then((res) => {
+    return res.json()
+  })
+  .then((json) => {
+    console.log(json)
+
+  })
+  .catch(console.log)
+}
+
+function getBlockHash(blockNumber) {
+  fetch(con, {
+    method: 'POST',
+    body: JSON.stringify({
+      "method": "getblockhash",
+      "params": [blockNumber]
+    }),
+    headers: {
+      'Content-Type': 'text/plain;',
+      'Authorization': 'Basic '+authHash
+    },
+  })
+  .then((res) => {
+    return res.json()
+  })
+  .then((json) => {
+    console.log(json)
+
+  })
+  .catch(console.log)
+}
