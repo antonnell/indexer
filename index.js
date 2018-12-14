@@ -130,9 +130,9 @@ function getBlock(blockHash, callback) {
   callBitcoin('getblock', [blockHash], (json) => {
     //store in DB
     async.parallel([
-      (callback) => { saveBlock(json, callback) },
-      (callback) => { setLatestLocalBlock(json.result.height, callback) },
-      (callback) => { getTransactions(json.result.tx, callback) }
+      (callbackInner) => { saveBlock(json.result, callbackInner) },
+      (callbackInner) => { setLatestLocalBlock(json.result.height, callbackInner) },
+      (callbackInner) => { getTransactions(json.result.tx, callbackInner) }
     ], callback)
   })
 }
@@ -143,8 +143,8 @@ function saveBlock(block, callback) {
   console.log('*******************************************************************************************')
   db.none("insert into blocks (hash, confirmations, strippedsize, size, weight, height, version, versionHex, merkleroot, time, mediantime, nonce, bits, difficulty, chainwork, ntx, previousblockhash, nextblockhash) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18);",
   [block.hash, block.confirmations, block.strippedsize, block.size, block.weight, block.height, block.version, block.versionHex, block.merkleroot, block.time, block.mediantime, block.nonce, block.bits, block.difficulty, block.chainwork, block.nTx, block.previousblockhash, block.nextblockhash])
-  .then(callback)
-  .catch(callback)
+    .then(callback)
+    .catch(callback)
 }
 
 function getTransactions(transactions, callback) {
@@ -153,7 +153,10 @@ function getTransactions(transactions, callback) {
 
 function getTransaction(transaction, callback) {
   callBitcoin('getTransaction', [transaction], (json) => {
-    saveTransaction(json.result, callback)
+    async.parallel([
+      (callbackInner) => { saveTransaction(json.result, callbackInner) },
+      (callbackInner) => { saveTransactionDetails(json.result, callbackInner) }
+    ], callback)
   })
 }
 
@@ -161,9 +164,24 @@ function saveTransaction(transaction, callback) {
   console.log('************************************* STORING NEW TXN *************************************')
   console.log(transaction)
   console.log('*******************************************************************************************')
-  // db.none("insert into transactions () values ();", [])
-  // .then(callback)
-  // .catch(callback)
+  db.none('insert into transactions (amount, fee, confirmations, generated, blockhash, blockindex, blocktime, txid, time, timereceived, bip125replaceable, comment, "to", hex) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14);',
+  [transaction.amount, transaction.fee, transaction.confirmations, transaction.generated, transaction.blockhash, transaction.blockindex, transaction.blocktime, transaction.txid, transaction.time, transaction.timereceived, transaction["bip125-replaceable"], transaction.comment, transaction.to, transaction.hex])
+    .then(callback)
+    .catch(callback)
+}
+
+function saveTransactionDetails(transaction, callback) {
+  async.mapLimit(transaction.details, 2, saveTransactionDetail, callback)
+}
+
+function saveTransactionDetail(details, callback) {
+  console.log('********************************* STORING NEW TXN DETAILS *********************************')
+  console.log(details)
+  console.log('*******************************************************************************************')
+  db.none('insert into transaction_details (account, address, category, amount, vout, fee) values ($1, $2, $3, $4, $5, $6);',
+  [details.amount, details.address, details.category, details.amount, details.vout, details.fee])
+    .then(callback)
+    .catch(callback)
 }
 
 function callBitcoin(method, params, callback) {
