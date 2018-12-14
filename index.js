@@ -45,7 +45,7 @@ function processBlocks() {
       console.log('*******************************************************************************************')
       return
     }
-    
+
     console.log('DEBUG ***********')
     console.log(blockDetails)
     console.log('DEBUG ***********')
@@ -83,7 +83,7 @@ function getLatestChainBlock(callback) {
       console.log(err)
       console.log('*******************************************************************************************')
     }
-    callback(value)
+    callback(err, value)
   });
 }
 
@@ -116,7 +116,7 @@ function getLatestLocalBlock(callback) {
       console.log('*******************************************************************************************')
     }
 
-    callback(value)
+    callback(err, value)
   });
 }
 
