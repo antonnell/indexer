@@ -61,7 +61,12 @@ function processBlocks() {
       console.log(parseInt(latestLocal) + 1)
       console.log('*******************************************************************************************')
 
-      getBlockHash(parseInt(latestLocal) + 1, processBlocks)
+      getBlockHash(parseInt(latestLocal) + 1, (err) => {
+        if(err) {
+          console.log(err)
+        }
+        processBlocks
+      })
     } else {
 
       console.log('DEBUG ***********')
