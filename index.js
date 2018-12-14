@@ -46,15 +46,17 @@ function processBlocks() {
       return
     }
 
-    console.log('DEBUG ***********')
-    console.log(blockDetails)
-    console.log('DEBUG ***********')
     let latestChain = blockDetails[0]
     let latestLocal = blockDetails[1]
 
     if(!latestLocal) {
       latestLocal = 0
     }
+
+    console.log('DEBUG ***********')
+    console.log('latest chain: '+latestChain)
+    console.log('latest chain: '+latestLocal)
+    console.log('DEBUG ***********')
 
     if(latestChain > latestLocal) {
       console.log("*********************************** PROCESSING NEW BLOCK **********************************")
