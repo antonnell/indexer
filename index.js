@@ -53,6 +53,8 @@ function processBlocks() {
       latestLocal = 0
     }
 
+    console.log(parseInt(latestChain) > parseInt(latestLocal))
+
     if(parseInt(latestChain) > parseInt(latestLocal)) {
       console.log("*********************************** PROCESSING NEW BLOCK **********************************")
       console.log(parseInt(latestLocal) + 1)
@@ -140,9 +142,9 @@ function getBlock(blockHash, callback) {
 }
 
 function saveBlock(block, callback) {
-  console.log('*************************************STORING NEW BLOCK*************************************')
-  console.log(block)
-  console.log('*******************************************************************************************')
+  // console.log('*************************************STORING NEW BLOCK*************************************')
+  // console.log(block)
+  // console.log('*******************************************************************************************')
   db.none("insert into blocks (hash, confirmations, strippedsize, size, weight, height, version, versionHex, merkleroot, time, mediantime, nonce, bits, difficulty, chainwork, ntx, previousblockhash, nextblockhash) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18);",
   [block.hash, block.confirmations, block.strippedsize, block.size, block.weight, block.height, block.version, block.versionHex, block.merkleroot, block.time, block.mediantime, block.nonce, block.bits, block.difficulty, block.chainwork, block.nTx, block.previousblockhash, block.nextblockhash])
     .then(callback)
@@ -165,9 +167,9 @@ function getTransaction(transaction, callback) {
 }
 
 function saveTransaction(transaction, callback) {
-  console.log('************************************* STORING NEW TXN *************************************')
-  console.log(transaction)
-  console.log('*******************************************************************************************')
+  // console.log('************************************* STORING NEW TXN *************************************')
+  // console.log(transaction)
+  // console.log('*******************************************************************************************')
 
   let vin = {
     result: transaction.vin
