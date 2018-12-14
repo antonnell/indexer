@@ -53,12 +53,7 @@ function processBlocks() {
       latestLocal = 0
     }
 
-    console.log('DEBUG ***********')
-    console.log('latest chain: '+latestChain)
-    console.log('latest chain: '+latestLocal)
-    console.log('DEBUG ***********')
-
-    if(latestChain > latestLocal) {
+    if(parseInt(latestChain) > parseInt(latestLocal)) {
       console.log("*********************************** PROCESSING NEW BLOCK **********************************")
       console.log(parseInt(latestLocal) + 1)
       console.log('*******************************************************************************************')
