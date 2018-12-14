@@ -147,7 +147,7 @@ function saveBlock(block, callback) {
 }
 
 function getTransactions(transactions, callback) {
-  async.map_limit(transactions, 10, getTransaction, callback)
+  async.mapLimit(transactions, 10, getTransaction, callback)
 }
 
 function getTransaction(transaction, callback) {
