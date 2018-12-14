@@ -23,7 +23,7 @@ function getBlock(blockHash) {
   })
   .then((json) => {
     console.log(json)
-    getBlock(json.result)
+    process.exit(0)
   })
   .catch(console.log)
 }
