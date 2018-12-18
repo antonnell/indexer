@@ -145,7 +145,7 @@ function saveBlock(block, callback) {
 function getTransactions(transactions, callback) {
 
   //neo returns the trnasaction for us. YAY!
-  async.mapLimit(transactions, 10, saveTransaction, callback)
+  async.mapLimit(transactions, 10, (transaction, callback) => { saveTransaction(transaction, block, callback) }, callback)
 }
 
 // function getTransaction(transaction, callback) {
@@ -154,7 +154,7 @@ function getTransactions(transactions, callback) {
 //   })
 // }
 
-function saveTransaction(transaction, callback) {
+function saveTransaction(transaction, block, callback) {
 
   let vin = {
     result: transaction.vin
@@ -169,7 +169,7 @@ function saveTransaction(transaction, callback) {
     result: transaction.attributes
   }
   db.none('insert into transactions (txid, size, type, version, attributes, vin, vout, sys_fee, net_fee, scripts, blockhash, confirmations, blocktime) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13);',
-  [transaction.txid, transaction.size, transaction.type, transaction.version, attributes, vin, vout, transaction.sys_fee, transaction.net_fee, scripts, transaction.blockhash, transaction.confirmations, transaction.blocktime])
+  [transaction.txid, transaction.size, transaction.type, transaction.version, attributes, vin, vout, transaction.sys_fee, transaction.net_fee, scripts, block.hash, block.confirmations, block.time])
     .then(() => {})
     .catch((err) => {
       console.log("****************************************** ERROR ******************************************")
