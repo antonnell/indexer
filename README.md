@@ -49,7 +49,9 @@
         <li>Bitcoin or any Bitcoin based chain</li>
         <li>Ethereum or any Ethereum based chain</li>
         <li>Neo or any Neo based chain</li>
+      </ul>
     </li>
+    <li>redis</li>
   </ul>
 
 
@@ -60,7 +62,7 @@
   apt-get install -y build-essential
   apt-get install -y nodejs
 
-  Following blockchain installation instructions per chain.
+  Follow blockchain installation instructions per required chain.
   ```
 
   ## License
