@@ -185,6 +185,8 @@ function call(method, params, callback) {
   fetch(con, {
     method: 'POST',
     body: JSON.stringify({
+      "jsonrpc": "2.0",
+      "id": 1,
       "method": method,
       "params": params
     }),
