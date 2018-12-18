@@ -5,7 +5,7 @@ const config = require('./config/config.js')
 const db = require('./pg_db').db
 const async = require('async')
 
-const con = config.chainUrl
+const con = config.chainURL
 const authHash = config.chainHash
 
 // startup process
