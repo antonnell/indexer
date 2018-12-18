@@ -123,8 +123,21 @@ function getBlock(blockNumber, callback) {
 }
 
 function saveBlock(block, callback) {
-  db.none("insert into blocks (hash, size, version, previousblockhash, merkleroot, time, index, nonce, nextconsensus, confirmations, nextblockhash) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11);",
-  [block.hash, block.size, block.version, block.previousblockhash, block.merkleroot, block.time, block.index, block.nonce, block.nextconsensus, block.confirmations, block.nextblockhash])
+
+  let headerExtensions = {
+    result: block.header_extensions
+  }
+
+  let blockExtensions = {
+    result: block.block_extensions
+  }
+
+  let tranactions = {
+    result: block.tranactions
+  }
+
+  db.none("insert into blocks (timestamp, producer, confirmed, previous, transaction_mroot, action_mroot, schedule_version, new_producers, header_extensions, producer_signature, transactions, block_extensions, id, block_num, ref_block_prefix) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15);",
+  [block.timestamp, block.producer, block.confirmed, block.previous, block.transaction_mroot, block.action_mroot, block.schedule_version, block.new_producers, headerExtensions, block.producer_signature, block.tranactions, blockExtensions, block.id, block.block_num, block.ref_block_prefix])
     .then(() => {})
     .catch((err) => {
       console.log("****************************************** ERROR ******************************************")
