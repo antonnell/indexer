@@ -30,7 +30,7 @@ const authHash = config.chainHash
 
 function startEos() {
   updateLatestChainBlock()
-  // processBlocks()
+  processBlocks()
 }
 
 function processBlocks() {
@@ -54,7 +54,7 @@ function processBlocks() {
     }
 
     if(parseInt(latestChain) > parseInt(latestLocal)) {
-      getBlockHash(parseInt(latestLocal) + 1, (err) => {
+      getBlock(parseInt(latestLocal) + 1, (err) => {
         if(err) {
           console.log(err)
         }
@@ -112,18 +112,12 @@ function getLatestLocalBlock(callback) {
   });
 }
 
-function getBlockHash(blockNumber, callback) {
-  call('getblockhash', [blockNumber], (json) => {
-    getBlock(json.result, callback)
-  })
-}
-
-function getBlock(blockHash, callback) {
-  call('getblock', [blockHash, 1], (json) => {
+function getBlock(blockNumber, callback) {
+  call('/v1/chain/get_block', { block_num_or_id: blockNumber }, (json) => {
     async.parallel([
-      (callbackInner) => { saveBlock(json.result, callbackInner) },
-      (callbackInner) => { setLatestLocalBlock(json.result.index, callbackInner) },
-      (callbackInner) => { getTransactions(json.result, callbackInner) }
+      (callbackInner) => { saveBlock(json, callbackInner) },
+      (callbackInner) => { setLatestLocalBlock(json.block_num, callbackInner) },
+      (callbackInner) => { getTransactions(json, callbackInner) }
     ], callback)
   })
 }
@@ -145,7 +139,7 @@ function saveBlock(block, callback) {
 function getTransactions(block, callback) {
 
   //neo returns the trnasaction for us. YAY!
-  async.mapLimit(block.tx, 10, (transaction, callback) => { saveTransaction(transaction, block, callback) }, callback)
+  async.mapLimit(block.transactions, 10, (transaction, callback) => { saveTransaction(transaction, block, callback) }, callback)
 }
 
 // function getTransaction(transaction, callback) {
@@ -156,33 +150,24 @@ function getTransactions(block, callback) {
 
 function saveTransaction(transaction, block, callback) {
 
-  let vin = {
-    result: transaction.vin
-  }
-  let vout = {
-    result: transaction.vout
-  }
-  let scripts = {
-    result: transaction.scripts
-  }
-  let attributes = {
-    result: transaction.attributes
-  }
-  db.none('insert into transactions (txid, size, type, version, attributes, vin, vout, sys_fee, net_fee, scripts, blockhash, confirmations, blocktime) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13);',
-  [transaction.txid, transaction.size, transaction.type, transaction.version, attributes, vin, vout, transaction.sys_fee, transaction.net_fee, scripts, block.hash, block.confirmations, block.time])
-    .then(() => {})
-    .catch((err) => {
-      console.log("****************************************** ERROR ******************************************")
-      console.log(err)
-      console.log('*******************************************************************************************')
-    })
+  // db.none('insert into transactions (txid, size, type, version, attributes, vin, vout, sys_fee, net_fee, scripts, blockhash, confirmations, blocktime) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13);',
+  // [transaction.txid, transaction.size, transaction.type, transaction.version, attributes, vin, vout, transaction.sys_fee, transaction.net_fee, scripts, block.hash, block.confirmations, block.time])
+  //   .then(() => {})
+  //   .catch((err) => {
+  //     console.log("****************************************** ERROR ******************************************")
+  //     console.log(err)
+  //     console.log('*******************************************************************************************')
+  //   })
 
+  console.log("********************************** TRANSACTION RECEIVED ***********************************")
+  console.log(transaction)
+  console.log('*******************************************************************************************')
   //we aren't waiting for the DB store to happen, just call callback!
   callback()
 }
 
 function call(method, params, callback) {
-  fetch(con+'method', {
+  fetch(con+method, {
     method: 'POST',
     body: JSON.stringify(params),
     headers: {
