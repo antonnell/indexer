@@ -87,7 +87,7 @@ function getLatestChainBlock(callback) {
 
 function updateLatestChainBlock() {
   call('/v1/chain/get_info', {}, (json) => {
-    setLatestChainBlock(json.result)
+    setLatestChainBlock(json.last_irreversible_block_num)
 
     setTimeout(updateLatestChainBlock, 60000)
   })
