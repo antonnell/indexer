@@ -1,62 +1,68 @@
-# Project Title
+  # Cross-Chain Indexer
 
-Cross-Chain indexer written in nodeJS.
-Very basic RPC parser for a couple of different chain bases. (bitcoin, ethereum, neo)
-Stores all the data in a PostgreSQL database.
+  Cross-Chain indexer written in nodeJS.<br />
+  Very basic RPC parser for a couple of different chain bases. (bitcoin, ethereum, neo)<br />
+  Stores all the data in a PostgreSQL database.<br />
 
-## Getting Started
+  ## Getting Started
 
-clone the repo
-npm install
-mkdir config
-vi config/config.js
-update with the following DB connection details and chain details
+  clone the repo
 
-```
-var config = {
-  host: '', //postgres DB host
-  database: '', //postgres DB database
-  user: '', //postgres DB user
-  password: '', //postgres DB password
-  chainBase: '', //bitcoin/ethereum/neo
-  chain: '', //bitcoin, bitcoin-abc, litecoin, ethereum, etc
-  bitcoinURL: '', //RPC connection for your bitcoin or bitcoin based node
-  bitcoinHash: '', //RPC autentication hash for your bitcoin or bitcoin based node
-  neoURL: '', //RPC connection for your neo node
-  neoHash: '', //RPC connection for your neo node
-  neoURL: '', //RPC connection for your ethereum node
-  neoHash: '' //RPC connection for your ethereum node
-}
+  ```
+  npm install
+  mkdir config
+  vi config/config.js
+  ```
 
-module.exports = config
-```
+  update with the following DB connection details and chain details
 
-node run index.js
+  ```
+  var config = {
+    host: '', //postgres DB host
+    database: '', //postgres DB database
+    user: '', //postgres DB user
+    password: '', //postgres DB password
+    chainBase: '', //bitcoin/ethereum/neo
+    chain: '', //bitcoin, bitcoin-abc, litecoin, ethereum, etc
+    bitcoinURL: '', //RPC connection for your bitcoin or bitcoin based node
+    bitcoinHash: '', //RPC autentication hash for your bitcoin or bitcoin based node
+    neoURL: '', //RPC connection for your neo node
+    neoHash: '', //RPC connection for your neo node
+    neoURL: '', //RPC connection for your ethereum node
+    neoHash: '' //RPC connection for your ethereum node
+  }
 
-### Prerequisites
+  module.exports = config
+  ```
 
-nodeJS
-NPM
-blockchain that needs to be parsed
-  Bitcoin or any Bitcoin based chain
-  Ethereum or any Ethereum based chain
-  Neo or any Neo based chain
+  ```
+  node run index.js
+  ```
 
-```
-sudo su
-curl -sL https://deb.nodesource.com/setup_11.x | bash -
-apt-get install -y build-essential
-apt-get install -y nodejs
+  ### Prerequisites
 
-Following blockchain installation instructions per chain.
-```
+  <ul>
+    <li>nodeJS</li>
+    <li>NPM</li>
+    <li>blockchain that needs to be parsed
+      <ul>
+        <li>Bitcoin or any Bitcoin based chain</li>
+        <li>Ethereum or any Ethereum based chain</li>
+        <li>Neo or any Neo based chain</li>
+    </li>
+  </ul>
 
-## Built With
 
-* [Dropwizard](http://www.dropwizard.io/1.0.2/docs/) - The web framework used
-* [Maven](https://maven.apache.org/) - Dependency Management
-* [ROME](https://rometools.github.io/rome/) - Used to generate RSS Feeds
 
-## License
+  ```
+  sudo su
+  curl -sL https://deb.nodesource.com/setup_11.x | bash -
+  apt-get install -y build-essential
+  apt-get install -y nodejs
 
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
+  Following blockchain installation instructions per chain.
+  ```
+
+  ## License
+
+  This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
