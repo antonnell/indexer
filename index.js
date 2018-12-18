@@ -14,6 +14,10 @@ function start() {
       service = require('./neo')
       service.startNeo()
       break;
+    case 'eos' :
+      service = require('./eos')
+      service.startEos()
+      break;
     case 'ethereum' :
 
       break;
