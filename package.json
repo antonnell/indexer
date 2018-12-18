@@ -1,13 +1,13 @@
 {
-  "name": "indexer-bitcoin",
-  "version": "1.0.0",
-  "description": "",
+  "name": "indexer-cross-chain",
+  "version": "0.0.1",
+  "description": "cross-chain indexer for saving blocks and transactions.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "antonnell.crypto@gmail.com",
+  "license": "mit",
   "dependencies": {
     "async": "^2.6.1",
     "node-fetch": "^2.3.0",
