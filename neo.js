@@ -28,7 +28,7 @@ const authHash = config.neoHash
   //        get transaction(transactionHash)
   //        transaction store in PostgresDB
 
-function startNNeo() {
+function startNeo() {
   updateLatestChainBlock()
   processBlocks()
 }
@@ -181,7 +181,7 @@ function saveTransaction(transaction, callback) {
   callback()
 }
 
-function call(method, params, callback) { 
+function call(method, params, callback) {
   fetch(con, {
     method: 'POST',
     body: JSON.stringify({
