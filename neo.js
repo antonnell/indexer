@@ -202,4 +202,4 @@ function call(method, params, callback) {
   .catch(console.log)
 }
 
-module.exports = { startNNeo }
+module.exports = { startNeo }
