@@ -123,7 +123,7 @@ function getBlock(blockHash, callback) {
     async.parallel([
       (callbackInner) => { saveBlock(json.result, callbackInner) },
       (callbackInner) => { setLatestLocalBlock(json.result.index, callbackInner) },
-      (callbackInner) => { getTransactions(json.result.tx, callbackInner) }
+      (callbackInner) => { getTransactions(json.result, callbackInner) }
     ], callback)
   })
 }
@@ -142,10 +142,10 @@ function saveBlock(block, callback) {
   callback()
 }
 
-function getTransactions(transactions, callback) {
+function getTransactions(block, callback) {
 
   //neo returns the trnasaction for us. YAY!
-  async.mapLimit(transactions, 10, (transaction, callback) => { saveTransaction(transaction, block, callback) }, callback)
+  async.mapLimit(block.tx, 10, (transaction, callback) => { saveTransaction(transaction, block, callback) }, callback)
 }
 
 // function getTransaction(transaction, callback) {
