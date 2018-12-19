@@ -30,7 +30,7 @@ const authHash = config.chainHash
 
 function startEthereum() {
   updateLatestChainBlock()
-  //processBlocks()
+  processBlocks()
 }
 
 function processBlocks() {
@@ -45,16 +45,13 @@ function processBlocks() {
       return
     }
 
-    let latestChain = blockDetails[0]
-    let latestLocal = blockDetails[1]
-
-    console.log("Block number " + latestLocal + " of " + latestChain)
-    if(!latestLocal) {
-      latestLocal = 0
+    console.log("Block number " + blockDetails[1] + " of " + blockDetails[0])
+    if(!blockDetails[1]) {
+      blockDetails[1] = 0
     }
 
-    if(parseInt(latestChain) > parseInt(latestLocal)) {
-      getBlockHash(parseInt(latestLocal) + 1, (err) => {
+    if(parseInt(blockDetails[0]) > parseInt(blockDetails[1])) {
+      getBlock(parseInt(blockDetails[1]) + 1, (err) => {
         if(err) {
           console.log(err)
         }
@@ -87,7 +84,7 @@ function getLatestChainBlock(callback) {
 
 function updateLatestChainBlock() {
   call('eth_blockNumber', [], (json) => {
-    setLatestChainBlock(parseInt(json.result, 16))
+    setLatestChainBlock(toDecimal(json.result))
 
     setTimeout(updateLatestChainBlock, 60000)
   })
@@ -112,14 +109,9 @@ function getLatestLocalBlock(callback) {
   });
 }
 
-function getBlockHash(blockNumber, callback) {
-  call('getblockhash', [blockNumber], (json) => {
-    getBlock(json.result, callback)
-  })
-}
 
-function getBlock(blockHash, callback) {
-  call('getblock', [blockHash, 1], (json) => {
+function getBlock(blockNumber, callback) {
+  call('eth_getBlockByNumber', [toHex(blockNumber), true], (json) => {
     if(json.result) {
       async.parallel([
         (callbackInner) => { saveBlock(json.result, callbackInner) },
@@ -133,8 +125,8 @@ function getBlock(blockHash, callback) {
 }
 
 function saveBlock(block, callback) {
-  db.none("insert into blocks (hash, size, version, previousblockhash, merkleroot, time, index, nonce, nextconsensus, confirmations, nextblockhash) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11);",
-  [block.hash, block.size, block.version, block.previousblockhash, block.merkleroot, block.time, block.index, block.nonce, block.nextconsensus, block.confirmations, block.nextblockhash])
+  db.none("insert into blocks (difficulty, gaslimit, gasused, hash, logsbloom, miner, mixhash, nonce, number, parenthash, receiptsroot, sha3uncles, size, stateroot, timestamp, totaldifficulty, transactionsroot, uncles) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18);",
+  [toDecimal(block.difficulty), toDecimal(block.gasLimit), toDecimal(block.gasUsed), block.hash, block.logsBloom, block.miner, block.mixHash, block.nonce, toDecimal(block.number), block.parentHash, block.receiptsRoot, block.sha3Uncles, toDecimal(block.size), block.stateRoot, toDecimal(block.timestamp), toDecimal(block.totalDifficulty), block.transactionsRoot, {result: block.uncles}])
     .then(() => {})
     .catch((err) => {
       console.log("****************************************** ERROR ******************************************")
@@ -149,31 +141,12 @@ function saveBlock(block, callback) {
 function getTransactions(block, callback) {
 
   //neo returns the trnasaction for us. YAY!
-  async.mapLimit(block.tx, 10, (transaction, callback) => { saveTransaction(transaction, block, callback) }, callback)
+  async.mapLimit(block.transactions, 10, (transaction, callback) => { saveTransaction(transaction, block, callback) }, callback)
 }
 
-// function getTransaction(transaction, callback) {
-//   call('getrawtransaction', [transaction, 1], (json) => {
-//     saveTransaction(json.result, callback)
-//   })
-// }
-
 function saveTransaction(transaction, block, callback) {
-
-  let vin = {
-    result: transaction.vin
-  }
-  let vout = {
-    result: transaction.vout
-  }
-  let scripts = {
-    result: transaction.scripts
-  }
-  let attributes = {
-    result: transaction.attributes
-  }
-  db.none('insert into transactions (txid, size, type, version, attributes, vin, vout, sys_fee, net_fee, scripts, blockhash, confirmations, blocktime) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13);',
-  [transaction.txid, transaction.size, transaction.type, transaction.version, attributes, vin, vout, transaction.sys_fee, transaction.net_fee, scripts, block.hash, block.confirmations, block.time])
+  db.none('insert into transactions (blockhash, blocknumber, from, gas, gasprice, hash, input, nonce, to, transactionindex, value, v, r, s) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14);',
+  [transaction.blockHash, transaction.blockNumber, transaction.from, transaction.gas, transaction.gasPrice, transaction.hash, transaction.input, transaction.nonce, transaction.to, transaction.transactionIndex, transaction.value, transaction.v, transaction.r, transaction.s])
     .then(() => {})
     .catch((err) => {
       console.log("****************************************** ERROR ******************************************")
@@ -205,6 +178,18 @@ function call(method, params, callback) {
     callback(json)
   })
   .catch(console.log)
+}
+
+function toHex(number) {
+  let hexString = number.toString(16);
+  if (hexString.length % 2) {
+    hexString = '0' + hexString;
+  }
+  return hexString
+}
+
+function toDecimal(hex) {
+  return parseInt(hex, 16)
 }
 
 module.exports = { startEthereum }
