@@ -182,9 +182,6 @@ function call(method, params, callback) {
 
 function toHex(number) {
   let hexString = number.toString(16);
-  if (hexString.length % 2) {
-    hexString = '0' + hexString;
-  }
   return '0x'+hexString
 }
 
