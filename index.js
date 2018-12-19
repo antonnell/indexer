@@ -18,6 +18,10 @@ function start() {
       service = require('./eos')
       service.startEos()
       break;
+    case 'cardano' :
+      service = require('./cardano')
+      service.startCardano()
+      break;
     case 'ethereum' :
 
       break;

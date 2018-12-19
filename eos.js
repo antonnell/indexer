@@ -48,13 +48,13 @@ function processBlocks() {
     let latestChain = blockDetails[0]
     let latestLocal = blockDetails[1]
 
-    console.log("Block number " + latestLocal + " of " + latestChain)
-    if(!latestLocal) {
-      latestLocal = 0
+    console.log("Block number " + blockDetails[1] + " of " + blockDetails[0])
+    if(!blockDetails[1]) {
+      blockDetails[1] = 0
     }
 
-    if(parseInt(latestChain) > parseInt(latestLocal)) {
-      getBlock(parseInt(latestLocal) + 1, (err) => {
+    if(parseInt(blockDetails[0]) > parseInt(blockDetails[1])) {
+      getBlockHash(parseInt(blockDetails[1]) + 1, (err) => {
         if(err) {
           console.log(err)
         }
@@ -123,21 +123,8 @@ function getBlock(blockNumber, callback) {
 }
 
 function saveBlock(block, callback) {
-
-  let headerExtensions = {
-    result: block.header_extensions
-  }
-
-  let blockExtensions = {
-    result: block.block_extensions
-  }
-
-  let transactions = {
-    result: block.transactions
-  }
-
   db.none("insert into blocks (timestamp, producer, confirmed, previous, transaction_mroot, action_mroot, schedule_version, new_producers, header_extensions, producer_signature, transactions, block_extensions, id, block_num, ref_block_prefix) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15);",
-  [block.timestamp, block.producer, block.confirmed, block.previous, block.transaction_mroot, block.action_mroot, block.schedule_version, block.new_producers, headerExtensions, block.producer_signature, transactions, blockExtensions, block.id, block.block_num, block.ref_block_prefix])
+  [block.timestamp, block.producer, block.confirmed, block.previous, block.transaction_mroot, block.action_mroot, block.schedule_version, block.new_producers, { result: block.header_extensions }, block.producer_signature, { result: block.transactions }, { result: block.block_extensions }, block.id, block.block_num, block.ref_block_prefix])
     .then(() => {})
     .catch((err) => {
       console.log("****************************************** ERROR ******************************************")

@@ -28,7 +28,7 @@ const authHash = config.chainHash
   //        get transaction(transactionHash)
   //        transaction store in PostgresDB
 
-function startNeo() {
+function startCardano() {
   updateLatestChainBlock()
   processBlocks()
 }
@@ -48,13 +48,13 @@ function processBlocks() {
     let latestChain = blockDetails[0]
     let latestLocal = blockDetails[1]
 
-    console.log("Block number " + latestLocal + " of " + latestChain)
-    if(!latestLocal) {
-      latestLocal = 0
+    console.log("Block number " + blockDetails[1] + " of " + blockDetails[0])
+    if(!blockDetails[1]) {
+      blockDetails[1] = 0
     }
 
-    if(parseInt(latestChain) > parseInt(latestLocal)) {
-      getBlockHash(parseInt(latestLocal) + 1, (err) => {
+    if(parseInt(blockDetails[0]) > parseInt(blockDetails[1])) {
+      getBlockHash(parseInt(blockDetails[1]) + 1, (err) => {
         if(err) {
           console.log(err)
         }
@@ -86,8 +86,8 @@ function getLatestChainBlock(callback) {
 }
 
 function updateLatestChainBlock() {
-  call('getblockcount', [], (json) => {
-    setLatestChainBlock(json.result)
+  call('/v1/chain/get_info', {}, (json) => {
+    setLatestChainBlock(json.last_irreversible_block_num)
 
     setTimeout(updateLatestChainBlock, 60000)
   })
@@ -112,25 +112,20 @@ function getLatestLocalBlock(callback) {
   });
 }
 
-function getBlockHash(blockNumber, callback) {
-  call('getblockhash', [blockNumber], (json) => {
-    getBlock(json.result, callback)
-  })
-}
-
-function getBlock(blockHash, callback) {
-  call('getblock', [blockHash, 1], (json) => {
+function getBlock(blockNumber, callback) {
+  call('/v1/chain/get_block', { block_num_or_id: blockNumber }, (json) => {
     async.parallel([
-      (callbackInner) => { saveBlock(json.result, callbackInner) },
-      (callbackInner) => { setLatestLocalBlock(json.result.index, callbackInner) },
-      (callbackInner) => { getTransactions(json.result, callbackInner) }
+      (callbackInner) => { saveBlock(json, callbackInner) },
+      (callbackInner) => { setLatestLocalBlock(json.block_num, callbackInner) },
+      (callbackInner) => { getTransactions(json, callbackInner) }
     ], callback)
   })
 }
 
 function saveBlock(block, callback) {
-  db.none("insert into blocks (hash, size, version, previousblockhash, merkleroot, time, index, nonce, nextconsensus, confirmations, nextblockhash) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11);",
-  [block.hash, block.size, block.version, block.previousblockhash, block.merkleroot, block.time, block.index, block.nonce, block.nextconsensus, block.confirmations, block.nextblockhash])
+
+  db.none("insert into blocks (timestamp, producer, confirmed, previous, transaction_mroot, action_mroot, schedule_version, new_producers, header_extensions, producer_signature, transactions, block_extensions, id, block_num, ref_block_prefix) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15);",
+  [block.timestamp, block.producer, block.confirmed, block.previous, block.transaction_mroot, block.action_mroot, block.schedule_version, block.new_producers, { result: block.header_extensions }, block.producer_signature, { result: block.transactions }, { result: block.block_extensions }, block.id, block.block_num, block.ref_block_prefix])
     .then(() => {})
     .catch((err) => {
       console.log("****************************************** ERROR ******************************************")
@@ -145,7 +140,7 @@ function saveBlock(block, callback) {
 function getTransactions(block, callback) {
 
   //neo returns the trnasaction for us. YAY!
-  async.mapLimit(block.tx, 10, (transaction, callback) => { saveTransaction(transaction, block, callback) }, callback)
+  async.mapLimit(block.transactions, 10, (transaction, callback) => { saveTransaction(transaction, block, callback) }, callback)
 }
 
 // function getTransaction(transaction, callback) {
@@ -156,43 +151,28 @@ function getTransactions(block, callback) {
 
 function saveTransaction(transaction, block, callback) {
 
-  let vin = {
-    result: transaction.vin
-  }
-  let vout = {
-    result: transaction.vout
-  }
-  let scripts = {
-    result: transaction.scripts
-  }
-  let attributes = {
-    result: transaction.attributes
-  }
-  db.none('insert into transactions (txid, size, type, version, attributes, vin, vout, sys_fee, net_fee, scripts, blockhash, confirmations, blocktime) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13);',
-  [transaction.txid, transaction.size, transaction.type, transaction.version, attributes, vin, vout, transaction.sys_fee, transaction.net_fee, scripts, block.hash, block.confirmations, block.time])
-    .then(() => {})
-    .catch((err) => {
-      console.log("****************************************** ERROR ******************************************")
-      console.log(err)
-      console.log('*******************************************************************************************')
-    })
+  // db.none('insert into transactions (txid, size, type, version, attributes, vin, vout, sys_fee, net_fee, scripts, blockhash, confirmations, blocktime) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13);',
+  // [transaction.txid, transaction.size, transaction.type, transaction.version, attributes, vin, vout, transaction.sys_fee, transaction.net_fee, scripts, block.hash, block.confirmations, block.time])
+  //   .then(() => {})
+  //   .catch((err) => {
+  //     console.log("****************************************** ERROR ******************************************")
+  //     console.log(err)
+  //     console.log('*******************************************************************************************')
+  //   })
 
+  console.log("********************************** TRANSACTION RECEIVED ***********************************")
+  console.log(transaction)
+  console.log('*******************************************************************************************')
   //we aren't waiting for the DB store to happen, just call callback!
   callback()
 }
 
 function call(method, params, callback) {
-  fetch(con, {
+  fetch(con+method, {
     method: 'POST',
-    body: JSON.stringify({
-      "jsonrpc": "2.0",
-      "id": 1,
-      "method": method,
-      "params": params
-    }),
+    body: JSON.stringify(params),
     headers: {
-      'Content-Type': 'text/plain;',
-      'Authorization': 'Basic '+authHash
+      'Content-Type': 'application/json'
     },
   })
   .then((res) => {
@@ -204,4 +184,4 @@ function call(method, params, callback) {
   .catch(console.log)
 }
 
-module.exports = { startNeo }
+module.exports = { startCardano }

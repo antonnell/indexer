@@ -5,8 +5,8 @@ const config = require('./config/config.js')
 const db = require('./pg_db').db
 const async = require('async')
 
-const con = config.bitcoinURL
-const authHash = config.bitcoinHash
+const con = config.chainURL
+const authHash = config.chainHash
 
 // startup process
 // connect to DB
@@ -48,13 +48,13 @@ function processBlocks() {
     let latestChain = blockDetails[0]
     let latestLocal = blockDetails[1]
 
-    console.log("Block number " + latestLocal + " of " + latestChain)
-    if(!latestLocal) {
-      latestLocal = 0
+    console.log("Block number " + blockDetails[1] + " of " + blockDetails[0])
+    if(!blockDetails[1]) {
+      blockDetails[1] = 0
     }
 
-    if(parseInt(latestChain) > parseInt(latestLocal)) {
-      getBlockHash(parseInt(latestLocal) + 1, (err) => {
+    if(parseInt(blockDetails[0]) > parseInt(blockDetails[1])) {
+      getBlockHash(parseInt(blockDetails[1]) + 1, (err) => {
         if(err) {
           console.log(err)
         }
@@ -149,15 +149,8 @@ function getTransaction(transaction, callback) {
 }
 
 function saveTransaction(transaction, callback) {
-
-  let vin = {
-    result: transaction.vin
-  }
-  let vout = {
-    result: transaction.vout
-  }
   db.none('insert into transactions (txid, hash, version, size, vsize, weight, locktime, vin, vout, blockhash, confirmations, time, blocktime) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13);',
-  [transaction.txid, transaction.hash, transaction.version, transaction.size, transaction.vsize, transaction.weight, transaction.locktime, vin, vout, transaction.blockhash, transaction.confirmations, transaction.time, transaction.blocktime])
+  [transaction.txid, transaction.hash, transaction.version, transaction.size, transaction.vsize, transaction.weight, transaction.locktime, { result: transaction.vin }, { result: transaction.vout }, transaction.blockhash, transaction.confirmations, transaction.time, transaction.blocktime])
     .then(() => {
 
     })
