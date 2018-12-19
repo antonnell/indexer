@@ -120,11 +120,15 @@ function getBlockHash(blockNumber, callback) {
 
 function getBlock(blockHash, callback) {
   call('getblock', [blockHash, 1], (json) => {
-    async.parallel([
-      (callbackInner) => { saveBlock(json.result, callbackInner) },
-      (callbackInner) => { setLatestLocalBlock(json.result.index, callbackInner) },
-      (callbackInner) => { getTransactions(json.result, callbackInner) }
-    ], callback)
+    if(json.result) {
+      async.parallel([
+        (callbackInner) => { saveBlock(json.result, callbackInner) },
+        (callbackInner) => { setLatestLocalBlock(json.result.index, callbackInner) },
+        (callbackInner) => { getTransactions(json.result, callbackInner) }
+      ], callback)
+    } else {
+      callback()
+    }
   })
 }
 
