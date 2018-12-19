@@ -145,7 +145,7 @@ function getTransactions(block, callback) {
 }
 
 function saveTransaction(transaction, block, callback) {
-  db.none('insert into transactions (blockhash, blocknumber, from, gas, gasprice, hash, input, nonce, to, transactionindex, value, v, r, s) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14);',
+  db.none('insert into transactions (blockhash, blocknumber, "from", gas, gasprice, hash, input, nonce, "to", transactionindex, value, v, r, s) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14);',
   [transaction.blockHash, transaction.blockNumber, transaction.from, transaction.gas, transaction.gasPrice, transaction.hash, transaction.input, transaction.nonce, transaction.to, transaction.transactionIndex, transaction.value, transaction.v, transaction.r, transaction.s])
     .then(() => {})
     .catch((err) => {
