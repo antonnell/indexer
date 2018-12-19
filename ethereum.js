@@ -150,6 +150,7 @@ function saveTransaction(transaction, block, callback) {
     .then(() => {})
     .catch((err) => {
       console.log("****************************************** ERROR ******************************************")
+      console.log(transaction)
       console.log(err)
       console.log('*******************************************************************************************')
     })
