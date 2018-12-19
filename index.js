@@ -6,6 +6,10 @@ function start() {
   let service = null
 
   switch(config.chainBase) {
+    case 'ethereum' :
+      service = require('./ethereum')
+      service.startEthereum()
+      break;
     case 'bitcoin' :
       service = require('./bitcoin')
       service.startBitcoin()
