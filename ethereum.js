@@ -185,7 +185,7 @@ function toHex(number) {
   if (hexString.length % 2) {
     hexString = '0' + hexString;
   }
-  return hexString
+  return '0x'+hexString
 }
 
 function toDecimal(hex) {
