@@ -115,7 +115,7 @@ function getBlock(blockNumber, callback) {
     if(json.result) {
       async.parallel([
         (callbackInner) => { saveBlock(json.result, callbackInner) },
-        (callbackInner) => { setLatestLocalBlock(json.result.index, callbackInner) },
+        (callbackInner) => { setLatestLocalBlock(toDecimal(json.result.number), callbackInner) },
         (callbackInner) => { getTransactions(json.result, callbackInner) }
       ], callback)
     } else {
