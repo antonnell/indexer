@@ -195,8 +195,7 @@ function call(method, params, callback) {
       "params": params
     }),
     headers: {
-      'Content-Type': 'text/plain;',
-      'Authorization': 'Basic '+authHash
+      'Content-Type': 'application/json;'
     },
   })
   .then((res) => {
