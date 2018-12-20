@@ -125,15 +125,12 @@ function getBlock(blockNumber, callback) {
 function saveBlock(block, callback) {
   db.none("insert into blocks (timestamp, producer, confirmed, previous, transaction_mroot, action_mroot, schedule_version, new_producers, header_extensions, producer_signature, transactions, block_extensions, id, block_num, ref_block_prefix) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15);",
   [block.timestamp, block.producer, block.confirmed, block.previous, block.transaction_mroot, block.action_mroot, block.schedule_version, block.new_producers, { result: block.header_extensions }, block.producer_signature, { result: block.transactions }, { result: block.block_extensions }, block.id, block.block_num, block.ref_block_prefix])
-    .then(() => {})
+    .then(callback)
     .catch((err) => {
       console.log("****************************************** ERROR ******************************************")
       console.log(err)
       console.log('*******************************************************************************************')
     })
-
-  //we aren't waiting for the DB store to happen, just call callback!
-  callback()
 }
 
 function getTransactions(block, callback) {
