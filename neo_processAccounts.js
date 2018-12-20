@@ -12,20 +12,8 @@ let neoBlockhash = 1495316245
 
 function start() {
   switch(config.chainBase) {
-    case 'ethereum' :
-      startEthereum()
-      break;
-    case 'bitcoin' :
-      startBitcoin()
-      break;
     case 'neo' :
       startNeo()
-      break;
-    case 'eos' :
-      startEos()
-      break;
-    case 'cardano' :
-      startCardano()
       break;
     default :
       {}

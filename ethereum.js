@@ -140,7 +140,7 @@ function saveBlock(block, callback) {
 function getTransactions(block, callback) {
 
   //neo returns the trnasaction for us. YAY!
-  async.mapLimit(block.transactions, 10, (transaction, callback) => { saveTransaction(transaction, block, callback) }, callback)
+  async.mapLimit(block.transactions, 10, (transaction, callbackInner) => { saveTransaction(transaction, block, callbackInner) }, callback)
 }
 
 function saveTransaction(transaction, block, callback) {
@@ -180,8 +180,7 @@ function call(method, params, callback) {
 }
 
 function toHex(number) {
-  let hexString = number.toString(16);
-  return '0x'+hexString
+  return '0x'+number.toString(16)
 }
 
 function toDecimal(hex) {
