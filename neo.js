@@ -36,6 +36,8 @@ function startNeo() {
 function processAccounts(transaction, callback) {
   let voutAccounts = transaction.vout.map((acc) => {
     return acc.address
+  }).filter(function(item, pos, self) {
+    return self.indexOf(item) == pos
   })
 
   async.mapLimit(voutAccounts, 2, getAccount, callback)
@@ -60,7 +62,6 @@ function saveAccount(account, accountHash, callback) {
   } else {
     neoBalance = 0
   }
-  console.log('NEO BALANCE: '+neoBalance)
   let gasBalance = account.balances.filter((bal) => {
     return bal.asset = "602c79718b16e442de58778e148d0b1084e3b2dffd5de6b7b16cee7969282de7"
   })
@@ -69,13 +70,10 @@ function saveAccount(account, accountHash, callback) {
   } else {
     gasBalance = 0
   }
-  console.log("GAS BALANCE: "+gasBalance)
 
   db.none("insert into accounts (hash, balances, neobalance, gasbalance) values ($1, $2, $3, $4);",
   [accountHash, { result: account.balances }, neoBalance, gasBalance])
-    .then(() => {
-      console.log('successfully inserted')
-    })
+    .then(() => { })
     .catch((err) => {
       console.log("****************************************** ERROR ******************************************")
       console.log(err)
