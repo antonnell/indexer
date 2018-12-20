@@ -47,7 +47,7 @@ function getAccount(acc, callback) {
   call('getaccountstate', [acc], (json) => {
     console.log(json)
     if(json.result) {
-      saveAccount(json.result, hash, callback)
+      saveAccount(json.result, acc, callback)
     } else {
       callback()
     }
@@ -73,7 +73,7 @@ function saveAccount(account, accountHash, callback) {
     gasBalance = 0
   }
 
-  
+
   db.none("insert into accounts (hash, balances, neobalance, gasbalance) values ($1, $2, $3, $4);",
   [accountHash, { result: account.balances }, neoBalance, gasBalance])
     .then(() => {})
