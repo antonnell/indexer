@@ -51,7 +51,7 @@ function startNeo() {
     })
 }
 
-processNeoAccount(transaction, callback) {
+function processNeoAccount(transaction, callback) {
   console.log("Transaction time: " + transaction.blocktime + " of 1510369447")
   let voutAccounts = transaction.vout.map((acc) => {
     return acc.address
