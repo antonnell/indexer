@@ -77,6 +77,7 @@ function saveAccount(account, accountHash, callback) {
     .catch((err) => {
       console.log("****************************************** ERROR ******************************************")
       console.log(err)
+      console.log(accountHash)
       console.log('*******************************************************************************************')
     })
 
@@ -187,6 +188,7 @@ function saveBlock(block, callback) {
     .catch((err) => {
       console.log("****************************************** ERROR ******************************************")
       console.log(err)
+      console.log(block)
       console.log('*******************************************************************************************')
     })
 
@@ -237,6 +239,7 @@ function saveTransaction(transaction, block, callback) {
     .catch((err) => {
       console.log("****************************************** ERROR ******************************************")
       console.log(err)
+      console.log(transaction)
       console.log('*******************************************************************************************')
     })
 
