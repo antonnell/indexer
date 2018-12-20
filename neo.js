@@ -71,7 +71,7 @@ function saveAccount(account, accountHash, callback) {
     gasBalance = 0
   }
 
-  db.none("insert into accounts (hash, balances, neobalance, gasbalance) values ($1, $2, $3, $4);",
+  db.none("insert into accounts (hash, balances, neobalance, gasbalance) values ($1, $2, $3, $4) ON CONFLICT (hash) DO UPDATE set balances=excluded.balances, neoBalance=excluded.neoBalance, gasBalance=excluded.gasbalance;",
   [accountHash, { result: account.balances }, neoBalance, gasBalance])
     .then(() => { })
     .catch((err) => {
