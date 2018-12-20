@@ -32,7 +32,7 @@ function start() {
 }
 
 function startNeo() {
-  db.manyOrNone('select blocktime, vout from transactions order by blocktime limit 10000;', [])
+  db.manyOrNone('select blocktime, vout from transactions order by blocktime;', [])
     .then((results) => {
       async.mapLimit(results, 5, processNeoAccount, (err) => {
         if(err) {
