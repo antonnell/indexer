@@ -35,7 +35,7 @@ function startNeo() {
 
 function processAccounts(transaction, callback) {
   console.log('PROCESSING AN ACCOUNT!')
-  let voutAccounts = transaction.vout.result.map((acc) => {
+  let voutAccounts = transaction.vout.map((acc) => {
     return acc.address
   })
 
@@ -98,16 +98,13 @@ function processBlocks() {
       return
     }
 
-    let latestChain = blockDetails[0]
-    let latestLocal = blockDetails[1]
-
-    console.log("Block number " + latestLocal + " of " + latestChain)
-    if(!latestLocal) {
-      latestLocal = 0
+    console.log("Block number " + blockDetails[1] + " of " + blockDetails[0])
+    if(!blockDetails[1]) {
+      blockDetails[1] = 0
     }
 
-    if(parseInt(latestChain) > parseInt(latestLocal)) {
-      getBlockHash(parseInt(latestLocal) + 1, (err) => {
+    if(parseInt(blockDetails[0]) > parseInt(blockDetails[1])) {
+      getBlockHash(parseInt(blockDetails[1]) + 1, (err) => {
         if(err) {
           console.log(err)
         }
