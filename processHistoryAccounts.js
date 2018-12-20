@@ -53,7 +53,12 @@ function startNeo() {
 
 function processNeoAccount(transaction, callback) {
   console.log("Transaction time: " + transaction.blocktime + " of 1510369447")
-  let voutAccounts = transaction.vout.map((acc) => {
+
+  if(transaction.vout.result.length == 0) {
+    return callback()
+  }
+
+  let voutAccounts = transaction.vout.result.map((acc) => {
     return acc.address
   }).filter(function(item, pos, self) {
     return self.indexOf(item) == pos
