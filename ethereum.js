@@ -127,7 +127,7 @@ function getBlock(blockNumber, callback) {
 function saveBlock(block, callback) {
   db.none("insert into blocks (difficulty, gaslimit, gasused, hash, logsbloom, miner, mixhash, nonce, number, parenthash, receiptsroot, sha3uncles, size, stateroot, timestamp, totaldifficulty, transactionsroot, uncles) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18);",
   [toDecimal(block.difficulty), toDecimal(block.gasLimit), toDecimal(block.gasUsed), block.hash, block.logsBloom, block.miner, block.mixHash, block.nonce, toDecimal(block.number), block.parentHash, block.receiptsRoot, block.sha3Uncles, toDecimal(block.size), block.stateRoot, toDecimal(block.timestamp), toDecimal(block.totalDifficulty), block.transactionsRoot, {result: block.uncles}])
-    .then(() => {})
+    .then(callback)
     .catch((err) => {
       console.log("****************************************** ERROR ******************************************")
       console.log(err)
@@ -135,7 +135,6 @@ function saveBlock(block, callback) {
     })
 
   //we aren't waiting for the DB store to happen, just call callback!
-  callback()
 }
 
 function getTransactions(block, callback) {
@@ -147,7 +146,7 @@ function getTransactions(block, callback) {
 function saveTransaction(transaction, block, callback) {
   db.none('insert into transactions (blockhash, blocknumber, "from", gas, gasprice, hash, input, nonce, "to", transactionindex, value, v, r, s) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14);',
   [transaction.blockHash, toDecimal(transaction.blockNumber), transaction.from, toDecimal(transaction.gas), toDecimal(transaction.gasPrice), transaction.hash, transaction.input, toDecimal(transaction.nonce), transaction.to, toDecimal(transaction.transactionIndex), toDecimal(transaction.value), toDecimal(transaction.v), transaction.r, transaction.s])
-    .then(() => {})
+    .then(callback)
     .catch((err) => {
       console.log("****************************************** ERROR ******************************************")
       console.log(transaction)
@@ -156,7 +155,6 @@ function saveTransaction(transaction, block, callback) {
     })
 
   //we aren't waiting for the DB store to happen, just call callback!
-  callback()
 }
 
 function call(method, params, callback) {
