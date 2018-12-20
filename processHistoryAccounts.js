@@ -8,7 +8,7 @@ const async = require('async')
 const con = config.chainURL
 const authHash = config.chainHash
 
-let neoBlockhash = 0
+let neoBlockhash = 1495316245
 
 function start() {
   switch(config.chainBase) {
