@@ -63,7 +63,7 @@ function getMaxBlockHash(callback) {
 }
 
 function getNeoData(blocktime, callback) {
-  db.manyOrNone('select blocktime, vout from transactions where blocktime > $1 order by blocktime limit 10000;', [blocktime])
+  db.manyOrNone('select blocktime, vout from transactions where blocktime > $1 order by blocktime limit 1000;', [blocktime])
     .then((results) => {
       async.mapLimit(results, 5, processNeoAccount, (err) => {
         if(err) {
@@ -128,15 +128,13 @@ function saveAccount(account, accountHash, callback) {
 
   db.none("insert into accounts (hash, balances, neobalance, gasbalance) values ($1, $2, $3, $4) ON CONFLICT (hash) DO UPDATE set balances=excluded.balances, neoBalance=excluded.neoBalance, gasBalance=excluded.gasbalance;",
   [accountHash, { result: account.balances }, neoBalance, gasBalance])
-    .then(() => { })
+    .then(callback)
     .catch((err) => {
       console.log("****************************************** ERROR ******************************************")
       console.log(err)
       console.log(accountHash)
       console.log('*******************************************************************************************')
     })
-
-  callback()
 }
 
 function call(method, params, callback) {
