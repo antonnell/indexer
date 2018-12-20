@@ -34,7 +34,7 @@ function start() {
 function startNeo() {
   db.manyOrNone('select blocktime, vout from transactions order by blocktime limit 10000;', [])
     .then((results) => {
-      async.map(results, 5, processNeoAccount, (err) => {
+      async.mapLimit(results, 5, processNeoAccount, (err) => {
         if(err) {
           console.log("****************************************** ERROR ******************************************")
           console.log(err)
