@@ -33,7 +33,7 @@ function start() {
 
 function startNeo() {
   db.manyOrNone('select * from transactions order by blocktime;', [])
-    .then((results) {
+    .then((results) => {
       async.map(results, 5, processNeoAccount, (err) => {
         if(err) {
           console.log("****************************************** ERROR ******************************************")
