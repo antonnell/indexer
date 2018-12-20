@@ -26,9 +26,6 @@ function start() {
       service = require('./cardano')
       service.startCardano()
       break;
-    case 'ethereum' :
-
-      break;
     default :
       {}
       break;

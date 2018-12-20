@@ -33,6 +33,59 @@ function startNeo() {
   processBlocks()
 }
 
+function processAccounts(transaction, callback) {
+  console.log('PROCESSING AN ACCOUNT!')
+  let voutAccounts = transaction.vout.result.map((acc) => {
+    return acc.address
+  })
+
+  console.log(voutAccounts)
+  async.mapLimit(voutAccounts, 2, getAccount, callback)
+}
+
+function getAccount(acc, callback) {
+  call('getaccountstate', [acc.address], (json) => {
+    console.log(json)
+    if(json.result) {
+      saveAccount(json.result, hash, callback)
+    } else {
+      callback()
+    }
+  })
+}
+
+function saveAccount(account, accountHash, callback) {
+  let neoBalance = account.balances.filter((bal) => {
+    return bal.asset = "c56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b"
+  })
+  if(neoBalance && neoBalance.length > 0) {
+    neoBalance = neoBalance[0].value
+  } else {
+    neoBalance = 0
+  }
+
+  let gasBalance = account.balances.filter((bal) => {
+    return bal.asset = "602c79718b16e442de58778e148d0b1084e3b2dffd5de6b7b16cee7969282de7"
+  })
+  if(gasBalance && gasBalance.length > 0) {
+    gasBalance = gasBalance[0].value
+  } else {
+    gasBalance = 0
+  }
+
+  db.none("insert into accounts (hash, balances, neobalance, gasbalance) values ($1, $2, $3, $4);",
+  [accountHash, { result: account.balances }, neoBalance, gasBalance])
+    .then(() => {})
+    .catch((err) => {
+      console.log("****************************************** ERROR ******************************************")
+      console.log(err)
+      console.log('*******************************************************************************************')
+    })
+
+  //we aren't waiting for the DB store to happen, just call callback!
+  callback()
+}
+
 function processBlocks() {
   async.parallel([
     (callback) => { getLatestChainBlock(callback) },
@@ -149,7 +202,10 @@ function saveBlock(block, callback) {
 function getTransactions(block, callback) {
 
   //neo returns the trnasaction for us. YAY!
-  async.mapLimit(block.tx, 10, (transaction, callback) => { saveTransaction(transaction, block, callback) }, callback)
+  async.mapLimit(block.tx,
+    2,
+    (transaction, callbackInner) => { saveTransaction(transaction, block, callbackInner) },
+    callback)
 }
 
 // function getTransaction(transaction, callback) {
@@ -174,7 +230,15 @@ function saveTransaction(transaction, block, callback) {
   }
   db.none('insert into transactions (txid, size, type, version, attributes, vin, vout, sys_fee, net_fee, scripts, blockhash, confirmations, blocktime) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13);',
   [transaction.txid, transaction.size, transaction.type, transaction.version, attributes, vin, vout, transaction.sys_fee, transaction.net_fee, scripts, block.hash, block.confirmations, block.time])
-    .then(() => {})
+    .then(() => {
+      processAccounts(transaction, (err) => {
+        if(err) {
+          console.log("****************************************** ERROR ******************************************")
+          console.log(err)
+          console.log('*******************************************************************************************')
+        }
+      })
+    })
     .catch((err) => {
       console.log("****************************************** ERROR ******************************************")
       console.log(err)
