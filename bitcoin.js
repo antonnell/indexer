@@ -127,15 +127,12 @@ function getBlock(blockHash, callback) {
 function saveBlock(block, callback) {
   db.none("insert into blocks (hash, confirmations, strippedsize, size, weight, height, version, versionHex, merkleroot, time, mediantime, nonce, bits, difficulty, chainwork, ntx, previousblockhash, nextblockhash) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18);",
   [block.hash, block.confirmations, block.strippedsize, block.size, block.weight, block.height, block.version, block.versionHex, block.merkleroot, block.time, block.mediantime, block.nonce, block.bits, block.difficulty, block.chainwork, block.nTx, block.previousblockhash, block.nextblockhash])
-    .then(() => {
-
-    })
+    .then(callback)
     .catch((err) => {
       console.log("****************************************** ERROR ******************************************")
       console.log(err)
       console.log('*******************************************************************************************')
     })
-  callback()
 }
 
 function getTransactions(transactions, callback) {
@@ -151,15 +148,12 @@ function getTransaction(transaction, callback) {
 function saveTransaction(transaction, callback) {
   db.none('insert into transactions (txid, hash, version, size, vsize, weight, locktime, vin, vout, blockhash, confirmations, time, blocktime) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13);',
   [transaction.txid, transaction.hash, transaction.version, transaction.size, transaction.vsize, transaction.weight, transaction.locktime, { result: transaction.vin }, { result: transaction.vout }, transaction.blockhash, transaction.confirmations, transaction.time, transaction.blocktime])
-    .then(() => {
-
-    })
+    .then(callback)
     .catch((err) => {
       console.log("****************************************** ERROR ******************************************")
       console.log(err)
       console.log('*******************************************************************************************')
     })
-  callback()
 }
 
 function callBitcoin(method, params, callback) {
