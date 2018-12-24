@@ -8,7 +8,7 @@ const async = require('async')
 const con = config.chainURL
 const authHash = config.chainHash
 
-let neoBlockhash = 1495316245
+let blocktime = 0
 
 function start() {
   getMaxBlockHash((maxBlock) => {
@@ -17,9 +17,9 @@ function start() {
 }
 
 function loop(maxBlock) {
-  getNeoData(neoBlockhash, () => {
-    if(neoBlockhash < maxBlock) {
-      console.log("DONE: " + neoBlockhash + " OF " + maxBlock)
+  getData(blocktime, () => {
+    if(blocktime < maxBlock) {
+      console.log("DONE: " + blocktime + " OF " + maxBlock)
       loop(maxBlock)
     } else {
       console.log('DONEZO')
@@ -28,7 +28,7 @@ function loop(maxBlock) {
 }
 
 function getMaxBlockHash(callback) {
-  db.oneOrNone('select max(blocktime) as maxblock from transactions;')
+  db.oneOrNone('select max(time) as maxblock from transactions;')
     .then((tx) => {
       callback(tx.maxblock)
     })
@@ -39,10 +39,10 @@ function getMaxBlockHash(callback) {
     })
 }
 
-function getNeoData(blocktime, callback) {
+function getData(blocktime, callback) {
   db.manyOrNone('select blocktime, vout from transactions where blocktime >= $1 order by blocktime limit 10000;', [blocktime])
     .then((results) => {
-      async.mapLimit(results, 5, processNeoAccount, (err) => {
+      async.mapLimit(results, 5, processAccount, (err) => {
         if(err) {
           console.log("****************************************** ERROR ******************************************")
           console.log(err)
@@ -59,8 +59,8 @@ function getNeoData(blocktime, callback) {
     })
 }
 
-function processNeoAccount(transaction, callback) {
-  neoBlockhash = transaction.blocktime
+function processAccount(transaction, callback) {
+  blocktime = transaction.blocktime
   if(transaction.vout.result.length == 0) {
     return callback()
   }
@@ -137,4 +137,4 @@ function call(method, params, callback) {
   .catch(console.log)
 }
 
-module.export = { start }
+start()

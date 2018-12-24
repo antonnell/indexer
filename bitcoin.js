@@ -76,6 +76,7 @@ function getLatestChainBlock(callback) {
       console.log("****************************************** ERROR ******************************************")
       console.log(err)
       console.log('*******************************************************************************************')
+      callback(err)
     }
     callback(err, value)
   });
@@ -102,6 +103,7 @@ function getLatestLocalBlock(callback) {
       console.log("****************************************** ERROR ******************************************")
       console.log(err)
       console.log('*******************************************************************************************')
+      callback(err)
     }
 
     callback(err, value)
@@ -132,6 +134,7 @@ function saveBlock(block, callback) {
       console.log("****************************************** ERROR ******************************************")
       console.log(err)
       console.log('*******************************************************************************************')
+      callback(err)
     })
 }
 
@@ -141,7 +144,11 @@ function getTransactions(transactions, callback) {
 
 function getTransaction(transaction, callback) {
   callBitcoin('getrawtransaction', [transaction, true], (json) => {
-    saveTransaction(json.result, callback)
+    async.parallel([
+      (callbackInner) => { saveTransaction(json.result, callbackInner) },
+      (callbackInner) => { saveVin(json.result.vin, callbackInner) },
+      (callbackInner) => { processVout(json.result.vin, json.result.txid, callbackInner) }
+    ], callback)
   })
 }
 
@@ -153,6 +160,55 @@ function saveTransaction(transaction, callback) {
       console.log("****************************************** ERROR ******************************************")
       console.log(err)
       console.log('*******************************************************************************************')
+      callback(err)
+    })
+}
+
+function saveVin(vin, callback) {
+  db.none('insert into vin (txid, voutindex, asm, hex, sequence) values ($1, $2, $3, $4, $5);',
+  [[vin.txid, vin.vout, vin.scriptSig.asm, vin.scriptSig.hex, vin.sequence]])
+    .then(callback)
+    .catch((err) => {
+      console.log("****************************************** ERROR ******************************************")
+      console.log(err)
+      console.log('*******************************************************************************************')
+      callback(err)
+    })
+}
+
+function processVout(vout, txid, callback) {
+  let insertUUID = uuid.v4()
+  async.parallel([
+    (callbackInner) => { saveVout(vout, txid, insertUUID, callbackInner) },
+    (callbackInner) => { processAddresses(vout.addresses, insertUUID, callbackInner) }
+  ], callback)
+}
+
+function processAddresses(addresses, insertUUID, callback) {
+  async.mapLimit(adresses, 1, (address, callbackInner) => { saveVoutAddress(address, insertUUID, callbackInner) }, callback)
+}
+
+function saveVout(vout, txid, insertUUID, callback) {
+  db.none('insert into vout (voutid, txid, value, index, asm, hex, regsigs, type, addresses) values ($1, $2, $3, $4, $5, $6, $7, $8, $9);',
+  [insertUUID, txid, vout.value, vout.n, vout.scriptPubKey.asm, vout.scriptPubKey.hex, vout.scriptPubKey.regSigs, vout.scriptPubKey.type, { result: vout.scriptPubKey.addresses }])
+    .then(callback)
+    .catch((err) => {
+      console.log("****************************************** ERROR ******************************************")
+      console.log(err)
+      console.log('*******************************************************************************************')
+      callback(err)
+    })
+}
+
+function saveVoutAddress(address, insertUUID, callback) {
+  db.none('insert into voutaddresses (voutid, address) values ($1, $2);',
+  [insertUUID, address])
+    .then(callback)
+    .catch((err) => {
+      console.log("****************************************** ERROR ******************************************")
+      console.log(err)
+      console.log('*******************************************************************************************')
+      callback(err)
     })
 }
 
