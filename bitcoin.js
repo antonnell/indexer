@@ -171,7 +171,7 @@ function saveTransaction(transaction, callback) {
     })
 }
 
-function saveVin(vin, txid. callback) {
+function saveVin(vin, txid, callback) {
   if(vin.coinbase != null) {
     db.none('insert into vin (txid, voutindex, asm, hex, sequence, coinbase) values ($1, null, null, null, null, $2);',
     [[txid, vin.coinbase]])
