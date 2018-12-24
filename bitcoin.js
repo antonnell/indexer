@@ -4,6 +4,7 @@ const client = redis.createClient()
 const config = require('./config/config.js')
 const db = require('./pg_db').db
 const async = require('async')
+const uuid = require('node-uuid')
 
 const con = config.chainURL
 const authHash = config.chainHash
@@ -153,7 +154,7 @@ function getTransaction(transaction, callback) {
     async.parallel([
       (callbackInner) => { saveTransaction(json.result, callbackInner) },
       (callbackInner) => { saveVin(json.result.vin, callbackInner) },
-      (callbackInner) => { processVout(json.result.vin, json.result.txid, callbackInner) }
+      (callbackInner) => { processVout(json.result.vout, json.result.txid, callbackInner) }
     ], callback)
   })
 }
