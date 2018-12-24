@@ -172,6 +172,7 @@ function saveTransaction(transaction, callback) {
 }
 
 function saveVin(vin, callback) {
+  console.log(vin)
   db.none('insert into vin (txid, voutindex, asm, hex, sequence) values ($1, $2, $3, $4, $5);',
   [[vin.txid, vin.vout, vin.scriptSig.asm, vin.scriptSig.hex, vin.sequence]])
     .then(callback)
