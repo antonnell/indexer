@@ -153,7 +153,7 @@ function getTransaction(transaction, callback) {
   callBitcoin('getrawtransaction', [transaction, true], (json) => {
     async.parallel([
       (callbackInner) => { saveTransaction(json.result, callbackInner) },
-      (callbackInner) => { saveVin(json.result.vin, callbackInner) },
+      (callbackInner) => { saveVin(json.result.vin, json.result.txid, callbackInner) },
       (callbackInner) => { processVout(json.result.vout, json.result.txid, callbackInner) }
     ], callback)
   })
@@ -171,17 +171,28 @@ function saveTransaction(transaction, callback) {
     })
 }
 
-function saveVin(vin, callback) {
-  console.log(vin)
-  db.none('insert into vin (txid, voutindex, asm, hex, sequence) values ($1, $2, $3, $4, $5);',
-  [[vin.txid, vin.vout, vin.scriptSig.asm, vin.scriptSig.hex, vin.sequence]])
-    .then(callback)
-    .catch((err) => {
-      console.log("****************************************** ERROR ******************************************")
-      console.log(err)
-      console.log('*******************************************************************************************')
-      callback(err)
-    })
+function saveVin(vin, txid. callback) {
+  if(vin.coinbase != null) {
+    db.none('insert into vin (txid, voutindex, asm, hex, sequence, coinbase) values ($1, null, null, null, null, $2);',
+    [[txid, vin.coinbase]])
+      .then(callback)
+      .catch((err) => {
+        console.log("****************************************** ERROR ******************************************")
+        console.log(err)
+        console.log('*******************************************************************************************')
+        callback(err)
+      })
+  } else {
+    db.none('insert into vin (txid, voutindex, asm, hex, sequence, coinbase) values ($1, $2, $3, $4, $5, null);',
+    [[vin.txid, vin.vout, vin.scriptSig.asm, vin.scriptSig.hex, vin.sequence]])
+      .then(callback)
+      .catch((err) => {
+        console.log("****************************************** ERROR ******************************************")
+        console.log(err)
+        console.log('*******************************************************************************************')
+        callback(err)
+      })
+  }
 }
 
 function processVout(vout, txid, callback) {
