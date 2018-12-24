@@ -120,9 +120,15 @@ function getBlock(blockHash, callback) {
   callBitcoin('getblock', [blockHash], (json) => {
     async.parallel([
       (callbackInner) => { saveBlock(json.result, callbackInner) },
-      (callbackInner) => { setLatestLocalBlock(json.result.height, callbackInner) },
       (callbackInner) => { getTransactions(json.result.tx, callbackInner) }
-    ], callback)
+    ], (err) => {
+      if(err) {
+        console.log("****************************************** ERROR ******************************************")
+        console.log(err)
+        console.log('*******************************************************************************************')
+      }
+      setLatestLocalBlock(json.result.height, callback)
+    })
   })
 }
 
