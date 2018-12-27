@@ -140,6 +140,7 @@ function saveBlock(block, callback) {
     .catch((err) => {
       console.log("****************************************** ERROR ******************************************")
       console.log(err)
+      console.log(block)
       console.log('*******************************************************************************************')
       callback(err)
     })
@@ -166,6 +167,7 @@ function saveTransaction(transaction, callback) {
     .catch((err) => {
       console.log("****************************************** ERROR ******************************************")
       console.log(err)
+      console.log(transaction)
       console.log('*******************************************************************************************')
       callback(err)
     })
@@ -182,6 +184,7 @@ function saveVin(vin, txid, callback) {
     .catch((err) => {
       console.log("****************************************** ERROR ******************************************")
       console.log(err)
+      console.log(vin)
       console.log('*******************************************************************************************')
       callback(err)
     })
@@ -213,6 +216,7 @@ function saveVout(vout, txid, insertUUID, callback) {
     .catch((err) => {
       console.log("****************************************** ERROR ******************************************")
       console.log(err)
+      console.log(vout)
       console.log('*******************************************************************************************')
       callback(err)
     })
@@ -225,6 +229,8 @@ function saveVoutAddress(address, insertUUID, callback) {
     .catch((err) => {
       console.log("****************************************** ERROR ******************************************")
       console.log(err)
+      console.log(address)
+      console.log(insertUUID)
       console.log('*******************************************************************************************')
       callback(err)
     })
