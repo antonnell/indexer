@@ -172,9 +172,16 @@ function getBlock(blockHash, callback) {
     if(json.result) {
       async.parallel([
         (callbackInner) => { saveBlock(json.result, callbackInner) },
-        (callbackInner) => { setLatestLocalBlock(json.result.index, callbackInner) },
         (callbackInner) => { getTransactions(json.result, callbackInner) }
-      ], callback)
+      ], (err) => {
+        if(err) {
+          console.log("****************************************** ERROR ******************************************")
+          console.log(err)
+          console.log('*******************************************************************************************')
+        }
+
+        setLatestLocalBlock(json.result.index, callback)
+      })
     } else {
       callback()
     }
