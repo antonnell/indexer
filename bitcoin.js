@@ -178,8 +178,8 @@ function processVin(vins, txid, callback) {
 }
 
 function saveVin(vin, txid, callback) {
-  db.none('insert into vin (txid, voutindex, asm, hex, sequence, coinbase) values ($1, $2, $3, $4, $5, $6);',
-  [txid, vin.vout, (vin.scriptSig!=null?vin.scriptSig.asm:null), (vin.scriptSig!=null?vin.scriptSig.hex:null), vin.sequence, vin.coinbase])
+  db.none('insert into vin (txid, vouttxid, voutindex, asm, hex, sequence, coinbase) values ($1, $2, $3, $4, $5, $6, $7);',
+  [txid, vin.txid, vin.vout, (vin.scriptSig!=null?vin.scriptSig.asm:null), (vin.scriptSig!=null?vin.scriptSig.hex:null), vin.sequence, vin.coinbase])
     .then(callback)
     .catch((err) => {
       console.log("****************************************** ERROR ******************************************")
