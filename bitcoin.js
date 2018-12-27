@@ -153,8 +153,8 @@ function getTransaction(transaction, callback) {
   callBitcoin('getrawtransaction', [transaction, true], (json) => {
     async.parallel([
       (callbackInner) => { saveTransaction(json.result, callbackInner) },
-      (callbackInner) => { saveVin(json.result.vin, json.result.txid, callbackInner) },
-      (callbackInner) => { processVout(json.result.vout, json.result.txid, callbackInner) }
+      (callbackInner) => { processVin(json.result.vin, json.result.txid, callbackInner) },
+      (callbackInner) => { processVouts(json.result.vout, json.result.txid, callbackInner) }
     ], callback)
   })
 }
@@ -169,6 +169,10 @@ function saveTransaction(transaction, callback) {
       console.log('*******************************************************************************************')
       callback(err)
     })
+}
+
+function processVin(vins, txid, callback) {
+  async.mapLimit(vins, 5, (vin, callbackInner) => { saveVin(vin, txid, callbackInner) }, callback)
 }
 
 function saveVin(vin, txid, callback) {
@@ -194,6 +198,10 @@ function saveVin(vin, txid, callback) {
         callback(err)
       })
   }
+}
+
+function processVouts(vouts, txid, callback) {
+  async.mapLimit(vouts, 5, (vout, callbackInner) => { processVout(vout, txid, callbackInner) }, callback)
 }
 
 function processVout(vout, txid, callback) {
