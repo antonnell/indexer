@@ -199,14 +199,51 @@ function saveBlock(block, callback) {
 function getTransactions(block, callback) {
 
   //neo returns the trnasaction for us. YAY!
-  async.mapLimit(block.tx, 2, (transaction, callbackInner) => { saveTransaction(transaction, block, callbackInner) }, callback)
+  async.mapLimit(block.tx, 2, (transaction, callbackInner) => { processTransaction(transaction, block, callbackInner) }, callback)
 }
 
-// function getTransaction(transaction, callback) {
-//   call('getrawtransaction', [transaction, 1], (json) => {
-//     saveTransaction(json.result, callback)
-//   })
-// }
+function processTransaction(transaction, block, callback) {
+  async.parallel([
+    (callbackInner) => { saveTransaction(transaction, block, callbackInner) },
+    (callbackInner) => { processVin(transaction.vin, transaction.txid, callbackInner) },
+    (callbackInner) => { processVout(transaction.vout, transaction.txid, callbackInner) }
+  ], callback)
+}
+
+
+function processVin(vins, txid, callback) {
+  async.mapLimit(vins, 5, (vin, callbackInner) => { saveVin(vin, txid, callbackInner) }, callback)
+}
+
+function saveVin(vin, txid, callback) {
+  db.none('insert into vin (txid, vouttxid, voutindex) values ($1, $2, $3);',
+  [txid, vin.txid, vin.vout])
+    .then(callback)
+    .catch((err) => {
+      console.log("****************************************** ERROR ******************************************")
+      console.log(err)
+      console.log(vin)
+      console.log('*******************************************************************************************')
+      callback(err)
+    })
+}
+
+function processVout(vouts, txid, callback) {
+  async.mapLimit(vouts, 5, (vout, callbackInner) => { saveVout(vout, txid, callbackInner) }, callback)
+}
+
+function saveVout(vout, txid, callback) {
+  db.none('insert into vout (txid, value, index, asset, address) values ($1, $2, $3, $4, $5);',
+  [txid, vout.value, vout.n, vout.asset, vout.address])
+    .then(callback)
+    .catch((err) => {
+      console.log("****************************************** ERROR ******************************************")
+      console.log(err)
+      console.log(vout)
+      console.log('*******************************************************************************************')
+      callback(err)
+    })
+}
 
 function saveTransaction(transaction, block, callback) {
 
