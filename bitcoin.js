@@ -176,28 +176,15 @@ function processVin(vins, txid, callback) {
 }
 
 function saveVin(vin, txid, callback) {
-  console.log(vin)
-  if(vin.coinbase != null) {
-    db.none('insert into vin (txid, voutindex, asm, hex, sequence, coinbase) values ($1, null, null, null, null, $2);',
-    [[txid, vin.coinbase]])
-      .then(callback)
-      .catch((err) => {
-        console.log("****************************************** ERROR ******************************************")
-        console.log(err)
-        console.log('*******************************************************************************************')
-        callback(err)
-      })
-  } else {
-    db.none('insert into vin (txid, voutindex, asm, hex, sequence, coinbase) values ($1, $2, $3, $4, $5, null);',
-    [[vin.txid, vin.vout, vin.scriptSig.asm, vin.scriptSig.hex, vin.sequence]])
-      .then(callback)
-      .catch((err) => {
-        console.log("****************************************** ERROR ******************************************")
-        console.log(err)
-        console.log('*******************************************************************************************')
-        callback(err)
-      })
-  }
+  db.none('insert into vin (txid, voutindex, asm, hex, sequence, coinbase) values ($1, $2, $3, $4, $5, $6);',
+  [[vin.txid, vin.vout, (vin.scriptSig!=null?vin.scriptSig.asm:null), (vin.scriptSig!=null?vin.scriptSig.hex:null), vin.sequence, vin.coinbase]])
+    .then(callback)
+    .catch((err) => {
+      console.log("****************************************** ERROR ******************************************")
+      console.log(err)
+      console.log('*******************************************************************************************')
+      callback(err)
+    })
 }
 
 function processVouts(vouts, txid, callback) {
@@ -213,6 +200,9 @@ function processVout(vout, txid, callback) {
 }
 
 function processAddresses(addresses, insertUUID, callback) {
+  if(!addresses) {
+    return callback()
+  }
   async.mapLimit(adresses, 1, (address, callbackInner) => { saveVoutAddress(address, insertUUID, callbackInner) }, callback)
 }
 
@@ -229,6 +219,8 @@ function saveVout(vout, txid, insertUUID, callback) {
 }
 
 function saveVoutAddress(address, insertUUID, callback) {
+  console.log(address)
+  console.log(insertUUID)
   db.none('insert into voutaddresses (voutid, address) values ($1, $2);',
   [insertUUID, address])
     .then(callback)
