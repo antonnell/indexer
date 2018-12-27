@@ -195,7 +195,7 @@ function processVout(vout, txid, callback) {
   let insertUUID = uuid.v4()
   async.parallel([
     (callbackInner) => { saveVout(vout, txid, insertUUID, callbackInner) },
-    (callbackInner) => { processAddresses(vout.addresses, insertUUID, callbackInner) }
+    (callbackInner) => { processAddresses(vout.scriptPubKey.addresses, insertUUID, callbackInner) }
   ], callback)
 }
 
@@ -219,8 +219,6 @@ function saveVout(vout, txid, insertUUID, callback) {
 }
 
 function saveVoutAddress(address, insertUUID, callback) {
-  console.log(address)
-  console.log(insertUUID)
   db.none('insert into voutaddresses (voutid, address) values ($1, $2);',
   [insertUUID, address])
     .then(callback)
