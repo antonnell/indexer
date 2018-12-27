@@ -177,7 +177,7 @@ function processVin(vins, txid, callback) {
 
 function saveVin(vin, txid, callback) {
   db.none('insert into vin (txid, voutindex, asm, hex, sequence, coinbase) values ($1, $2, $3, $4, $5, $6);',
-  [[vin.txid, vin.vout, (vin.scriptSig!=null?vin.scriptSig.asm:null), (vin.scriptSig!=null?vin.scriptSig.hex:null), vin.sequence, vin.coinbase]])
+  [vin.txid, vin.vout, (vin.scriptSig!=null?vin.scriptSig.asm:null), (vin.scriptSig!=null?vin.scriptSig.hex:null), vin.sequence, vin.coinbase])
     .then(callback)
     .catch((err) => {
       console.log("****************************************** ERROR ******************************************")
@@ -207,8 +207,8 @@ function processAddresses(addresses, insertUUID, callback) {
 }
 
 function saveVout(vout, txid, insertUUID, callback) {
-  db.none('insert into vout (voutid, txid, value, index, asm, hex, regsigs, type, addresses) values ($1, $2, $3, $4, $5, $6, $7, $8, $9);',
-  [insertUUID, txid, vout.value, vout.n, vout.scriptPubKey.asm, vout.scriptPubKey.hex, vout.scriptPubKey.regSigs, vout.scriptPubKey.type, { result: vout.scriptPubKey.addresses }])
+  db.none('insert into vout (voutid, txid, value, index, asm, hex, reqsigs, type, addresses) values ($1, $2, $3, $4, $5, $6, $7, $8, $9);',
+  [insertUUID, txid, vout.value, vout.n, vout.scriptPubKey.asm, vout.scriptPubKey.hex, vout.scriptPubKey.reqSigs, vout.scriptPubKey.type, { result: vout.scriptPubKey.addresses }])
     .then(callback)
     .catch((err) => {
       console.log("****************************************** ERROR ******************************************")
