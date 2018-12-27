@@ -203,7 +203,7 @@ function processAddresses(addresses, insertUUID, callback) {
   if(!addresses) {
     return callback()
   }
-  async.mapLimit(adresses, 1, (address, callbackInner) => { saveVoutAddress(address, insertUUID, callbackInner) }, callback)
+  async.mapLimit(addresses, 1, (address, callbackInner) => { saveVoutAddress(address, insertUUID, callbackInner) }, callback)
 }
 
 function saveVout(vout, txid, insertUUID, callback) {
