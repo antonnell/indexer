@@ -40,7 +40,7 @@ function processAccounts(transaction, callback) {
     return self.indexOf(item) == pos
   })
 
-  async.mapLimit(voutAccounts, 2, getAccount, callback)
+  async.mapLimit(voutAccounts, 1, getAccount, callback)
 }
 
 function getAccount(acc, callback) {
@@ -206,7 +206,7 @@ function saveBlock(block, callback) {
 function getTransactions(block, callback) {
 
   //neo returns the trnasaction for us. YAY!
-  async.mapLimit(block.tx, 2, (transaction, callbackInner) => { processTransaction(transaction, block, callbackInner) }, callback)
+  async.mapLimit(block.tx, 1, (transaction, callbackInner) => { processTransaction(transaction, block, callbackInner) }, callback)
 }
 
 function processTransaction(transaction, block, callback) {
