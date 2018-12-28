@@ -141,7 +141,7 @@ function saveBlock(block, callback) {
 function getTransactions(block, callback) {
 
   //eth returns the trnasaction for us. YAY!
-  async.mapLimit(block.transactions, 10, (transaction, callbackInner) => { saveTransaction(transaction, block, callbackInner) }, callback)
+  async.mapLimit(block.transactions, 5, (transaction, callbackInner) => { saveTransaction(transaction, block, callbackInner) }, callback)
 }
 
 function saveTransaction(transaction, block, callback) {
