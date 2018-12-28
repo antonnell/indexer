@@ -145,7 +145,6 @@ function getTransactions(block, callback) {
 }
 
 function saveTransaction(transaction, block, callback) {
-  console.log(transaction)
   db.none('insert into transactions (blockhash, blocknumber, "from", gas, gasprice, hash, input, nonce, "to", transactionindex, value, v, r, s) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14);',
   [transaction.blockHash, toDecimal(transaction.blockNumber), transaction.from, toDecimal(transaction.gas), toDecimal(transaction.gasPrice), transaction.hash, transaction.input, toDecimal(transaction.nonce), transaction.to, toDecimal(transaction.transactionIndex), toDecimal(transaction.value), toDecimal(transaction.v), transaction.r, transaction.s])
     .then(callback)
