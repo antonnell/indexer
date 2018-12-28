@@ -115,9 +115,10 @@ function getBlock(blockNumber, callback) {
     if(json.result) {
       async.parallel([
         (callbackInner) => { saveBlock(json.result, callbackInner) },
-        (callbackInner) => { setLatestLocalBlock(toDecimal(json.result.number), callbackInner) },
         (callbackInner) => { getTransactions(json.result, callbackInner) }
-      ], callback)
+      ], (err) => {
+        setLatestLocalBlock(toDecimal(json.result.number), callback)
+      })
     } else {
       callback()
     }
@@ -139,7 +140,7 @@ function saveBlock(block, callback) {
 
 function getTransactions(block, callback) {
 
-  //neo returns the trnasaction for us. YAY!
+  //eth returns the trnasaction for us. YAY!
   async.mapLimit(block.transactions, 10, (transaction, callbackInner) => { saveTransaction(transaction, block, callbackInner) }, callback)
 }
 
