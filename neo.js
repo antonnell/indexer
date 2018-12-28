@@ -103,7 +103,7 @@ function processBlocks() {
     }
 
     if(parseInt(blockDetails[0]) > parseInt(blockDetails[1])) {
-      getBlockHash(parseInt(blockDetails[1]) + 1, (err) => {
+      getBlock(parseInt(blockDetails[1]) + 1, (err) => {
         if(err) {
           console.log(err)
         }
@@ -161,14 +161,8 @@ function getLatestLocalBlock(callback) {
   });
 }
 
-function getBlockHash(blockNumber, callback) {
-  call('getblockhash', [blockNumber], (json) => {
-    getBlock(json.result, callback)
-  })
-}
-
-function getBlock(blockHash, callback) {
-  call('getblock', [blockHash, 1], (json) => {
+function getBlock(blockNumber, callback) {
+  call('getblock', [blockNumber, 1], (json) => {
     if(json.result) {
       async.parallel([
         (callbackInner) => { saveBlock(json.result, callbackInner) },
