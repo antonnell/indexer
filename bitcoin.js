@@ -223,17 +223,33 @@ function saveVout(vout, txid, insertUUID, callback) {
 }
 
 function saveVoutAddress(address, insertUUID, callback) {
-  db.none('insert into voutaddresses (voutid, address) values ($1, $2);',
-  [insertUUID, address])
-    .then(callback)
-    .catch((err) => {
-      console.log("****************************************** ERROR ******************************************")
-      console.log(err)
-      console.log(address)
-      console.log(insertUUID)
-      console.log('*******************************************************************************************')
-      callback(err)
-    })
+  if(config.chain == 'bitcoin-abc') {
+
+    var parts = str.split(':');
+    db.none('insert into voutaddresses (voutid, address, addressraw) values ($1, $2, $3);',
+    [insertUUID, (parts&&parts.length > 1 ? parts[1] : null), address])
+      .then(callback)
+      .catch((err) => {
+        console.log("****************************************** ERROR ******************************************")
+        console.log(err)
+        console.log(address)
+        console.log(insertUUID)
+        console.log('*******************************************************************************************')
+        callback(err)
+      })
+  } else {
+    db.none('insert into voutaddresses (voutid, address) values ($1, $2);',
+    [insertUUID, address])
+      .then(callback)
+      .catch((err) => {
+        console.log("****************************************** ERROR ******************************************")
+        console.log(err)
+        console.log(address)
+        console.log(insertUUID)
+        console.log('*******************************************************************************************')
+        callback(err)
+      })
+  }
 }
 
 function callBitcoin(method, params, callback) {
