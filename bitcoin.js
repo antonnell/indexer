@@ -225,7 +225,7 @@ function saveVout(vout, txid, insertUUID, callback) {
 function saveVoutAddress(address, insertUUID, callback) {
   if(config.chain == 'bitcoin-abc') {
 
-    var parts = str.split(':');
+    var parts = address.split(':');
     db.none('insert into voutaddresses (voutid, address, addressraw) values ($1, $2, $3);',
     [insertUUID, (parts&&parts.length > 1 ? parts[1] : null), address])
       .then(callback)
