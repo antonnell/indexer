@@ -55,7 +55,7 @@ function processBlocks() {
         if(err) {
           console.log(err)
         }
-        processBlocks()
+        setTimeout(processBlocks, 100)
       })
     } else {
 
