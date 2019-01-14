@@ -31,6 +31,7 @@ const authHash = config.chainHash
 function startEthereum() {
 
   getMissingBlocks(maxBlock, (blocks)=> {
+    console.log("Processing: " + blocks.length + " blocks")
     processBlocks(blocks)
   })
 
@@ -152,4 +153,4 @@ function toDecimal(hex) {
   return parseInt(hex, 16)
 }
 
-module.exports = { startEthereum }
+startEthereum()
