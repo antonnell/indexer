@@ -52,7 +52,7 @@ function getMaxBlock() {
 }
 
 function getMissingBlocks() {
-  db.manyOrNone("select series.num from (select generate_series(3000000, 4000000) as num) series left join blocks bl on series.num = bl.number where bl.number is null limit 10", [])
+  db.manyOrNone("select series.num from (select generate_series(3600000, 4000000) as num) series left join blocks bl on series.num = bl.number where bl.number is null limit 10", [])
     .then(callback)
     .catch((err) => {
       console.log("****************************************** ERROR ******************************************")
