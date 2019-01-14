@@ -30,7 +30,7 @@ const authHash = config.chainHash
 
 function startEthereum() {
 
-  getMissingBlocks(maxBlock, (blocks)=> {
+  getMissingBlocks((blocks)=> {
     console.log("Processing: " + blocks.length + " blocks")
     processBlocks(blocks)
   })
@@ -42,7 +42,7 @@ function startEthereum() {
   // })
 }
 
-function getMaxBlock() {
+function getMaxBlock(callback) {
   db.oneOrNone("select max(number) as block_height from blocks;", [])
     .then(callback)
     .catch((err) => {
@@ -52,7 +52,7 @@ function getMaxBlock() {
     })
 }
 
-function getMissingBlocks() {
+function getMissingBlocks(callback) {
   db.manyOrNone("select series.num from (select generate_series(3600000, 4000000) as num) series left join blocks bl on series.num = bl.number where bl.number is null limit 10", [])
     .then(callback)
     .catch((err) => {
@@ -70,6 +70,8 @@ function processBlocks(blocks) {
       console.log('*******************************************************************************************')
       return
     }
+
+    console.log('I guess we are done?')
   })
 }
 
