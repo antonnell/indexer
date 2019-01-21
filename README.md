@@ -24,12 +24,8 @@
     password: '', //postgres DB password
     chainBase: '', //bitcoin/ethereum/neo
     chain: '', //bitcoin, bitcoin-abc, litecoin, ethereum, etc
-    bitcoinURL: '', //RPC connection for your bitcoin or bitcoin based node
-    bitcoinHash: '', //RPC autentication hash for your bitcoin or bitcoin based node
-    neoURL: '', //RPC connection for your neo node
-    neoHash: '', //RPC connection for your neo node
-    neoURL: '', //RPC connection for your ethereum node
-    neoHash: '' //RPC connection for your ethereum node
+    chainURL: '', //RPC connection for your bitcoin or bitcoin based node
+    chainHash: '', //RPC autentication hash for your bitcoin or bitcoin based node
   }
 
   module.exports = config
